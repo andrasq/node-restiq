@@ -1,0 +1,35 @@
+{
+  "name": "restiq",
+  "version": "0.0.1",
+  "description": "fast, light-weight REST micro-framework",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "author": {
+    "name": "Andras",
+    "url": "http://github.com/andrasq"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/andrasq/node-restiq"
+  },
+  "engines": {
+    "node": ">=0.0.0"
+  },
+  "scripts": {
+    "test": "nodeunit"
+  },
+  "keywords": [
+    "Andras",
+    "quick",
+    "fast",
+    "rest",
+    "framework",
+    "restify",
+    "express"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "nodeunit": "0.9.0"
+  }
+}
