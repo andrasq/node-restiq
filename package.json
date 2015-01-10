@@ -1,6 +1,6 @@
 {
   "name": "restiq",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "fast, light-weight REST micro-framework",
   "license": "Apache-2.0",
   "main": "index.js",
@@ -13,7 +13,7 @@
     "url": "git://github.com/andrasq/node-restiq"
   },
   "engines": {
-    "node": ">=0.0.0"
+    "node": ">0.0.0"
   },
   "scripts": {
     "test": "nodeunit"
@@ -28,6 +28,8 @@
     "express"
   ],
   "dependencies": {
+    "arlib": "0.2.3",
+    "aflow": "0.2.3"
   },
   "devDependencies": {
     "nodeunit": "0.9.0"
