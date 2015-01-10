@@ -38,7 +38,7 @@ Example
         app.listen(8080);
 
         // wrk -d20s -t2 -c8 'http://localhost:8080/echo?a=1&b=2&c=3&d=4&e=5'
-        // => 18.8k requests / second (54.3k/s cluster of 3)
+        // => 18.9k requests / second (54.3k/s cluster of 3)
 
 
 Tips
