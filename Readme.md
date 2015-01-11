@@ -112,9 +112,10 @@ add shared middleware step to be called before every request.
 add shared middleware step to be called before every request after the `pre()`
 steps have all finished.
 
-### app.post( func )
+### app.finally( func )
 
-add shared middleware step to be called after every request.
+add shared middleware step to be called after every request.  The finally
+steps are run regardless, even if the call errored out.
 
 ### app.addRoute( method, path, func )
 
@@ -180,9 +181,8 @@ for the on('end') event.  Be careful when using this:  if the request has a
 body it needs to be consumed.
 
 
-TODO
+Todo
 ----
 
 - unit tests
-- res.send() method
-- res.sendHeader() method
+
