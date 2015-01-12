@@ -37,12 +37,17 @@ A small echo server, parses and returns the url query parameters:
 - [restiq](https://www.npmjs.org/package/restiq) - 19.5k/s
 - [http](https://nodejs.org/api/http.html) - 17.6k/s
 - [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
-- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s (198/sec, to be precise*)
+- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* or 1.8k/s with `setNoDelay()`
+  (loop over the hapi sockets hashed in `reply.request.connection._connections`)
 
-\* - this may be a res.write() + res.end() issue with http.ServerResponse.  It
-     is unfortunately very easily reproducible with
+\* - there is a res.write() issue with http.ServerResponse.  Calls writing or
+     piping the response run at precisely 25 requests/second per connection.
+     It is very easily reproducible; the fix is to add a
+     `res.socket.setNoDelay()` into the request handler (see below).
 
+        // example of http res.write() bottleneck
         var server = http.createServer( function(req, res) {
+            res.socket.setNoDelay();    // compare with and without setNoDelay
             req.on('data', function(){});
             req.on('end', function(){
                 res.write('Hello, world!\n');
@@ -348,3 +353,4 @@ Todo
   required/optional/unknown params
 - double-check the restify compatibility calls, only pass the arguments
   that exist!  else code that uses arguments.length will break
+- make send() set Content-Length
