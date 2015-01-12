@@ -128,20 +128,22 @@ The options:
 - `debug` - include stack traces in error responses.  Be cautious about
    sending backtraces off-site.
 - `restify` - make the response have methods `res.send` for easier
-   compatibility with restify.  This slows the processing rate, so use only as
-   needed.  (TODO: work in progress)
+   compatibility with restify.  This eats into the throughput some, so
+   use only as needed.
 
         var Restiq = require('restiq');
         var app = Restiq.createServer(options);
 
 ### app.listen( port, [hostname], [backlog], [confirmationCallback] )
 
-start the service.  If given, confirmationCallback will be invoked when the
-service is ready to receive requests.
+start the service.  If given, confirmationCallback will be invoked when
+the service is ready to receive requests.  Hostname and backlog as for
+`http.createServer`.
 
 ### app.pre( func )
 
-add shared middleware step to be called before every request.
+add shared middleware step to be called before every request.  Pre steps
+are called in the order added.
 
 ### app.use( func )
 
@@ -164,6 +166,12 @@ with results in a 405 error.
 Paths can embed named parameters, denoted with `/:paramName`.  Named
 parameters are extracted and stored into req.params (see also
 `mw.parseRouteParams` below.
+
+For restify compatibility, mapped routes execute those `use` steps that
+existed when the route was mapped.  In the sequence `use`, `use`, `map(1)`,
+`use`, `map(2)`, calls that request the first mapped route will run only the
+first two `use` steps, but calls that request the second mapped route will run
+all three.  All calls will run all `finally` steps (if any).
 
 ### app.mapRoute( method, path )
 
@@ -222,8 +230,51 @@ body it needs to be consumed.
 Restify Compatibility Layer
 ---------------------------
 
-(mostly working I guess, my restify app runs on top of restiq; specifics
-forthcoming)
+This is what I have so far --
+
+### app.get( path, handler, [handler2, ...] )
+
+add a GET route, with handlers to run in the order listed
+
+### app.post( path, handler, [handler2, ...] )
+
+add a POST route, with handlers to run in the order listed
+
+### app.put( path, handler, [handler2, ...] )
+
+add a PUT route, with handlers to run in the order listed
+
+### app.del( path, handler, [handler2, ...] )
+
+add a DEL route, with handlers to run in the order listed
+
+### req.getId( )
+
+returns the request id contained in the request headers.  Unlike restify,
+restiq uses a dash `-` if can't find one, and  does not make one up.
+
+### req.version( )
+
+returns the options.version string that was passed to createServer()
+
+### res.header( name, value )
+
+set a header value, aka writeHeader
+
+### res.get( name )
+
+read back a set header value
+
+### res.send( [statusCode], [response] )
+
+send a response.  The default status code is 200, the default response the
+empty string.  The call determines the content type from the response value,
+and emits an appropriate header as well.  NOTE:  restify penalizes sending a
+response without first explicitly setting the Content-Type header.  Time it
+yourself.
+
+Turns out restify responses are also extensions of `http.ServerResponse`, so
+all the usual write(), writeHead(), end() work as well.
 
 
 Tips
