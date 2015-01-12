@@ -37,8 +37,19 @@ A small echo server, parses and returns the url query parameters:
 - [restiq](https://www.npmjs.org/package/restiq) - 19.5k/s
 - [http](https://nodejs.org/api/http.html) - 17.6k/s
 - [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
-- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s (198/sec, to be precise)
+- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s (198/sec, to be precise*)
 
+\* - this may be a res.write() + res.end() issue with http.ServerResponse.  It
+     is unfortunately very easily reproducible with
+
+        var server = http.createServer( function(req, res) {
+            req.on('data', function(){});
+            req.on('end', function(){
+                res.write('Hello, world!\n');
+                res.end();
+            });
+        });
+        server.listen(1337);
 
 Overview
 --------
@@ -184,7 +195,7 @@ with results in a 405 error.
 
 Paths can embed named parameters, denoted with `/:paramName`.  Named
 parameters are extracted and stored into req.params (see also
-`mw.parseRouteParams` below.
+`mw.parseRouteParams` below).
 
 For restify compatibility, mapped routes execute those `use` steps that
 existed when the route was mapped.  In the sequence `use`, `use`, `map(1)`,
@@ -202,8 +213,8 @@ The mapped route includes the requested `path`, the matching route `name`, the
 
 For example
 
-        app.mapRoute('GET', '/:color/echo', echoGreen)
-        app.getRoute('GET', '/green/echo?a=1&b=2')
+        app.addRoute('GET', '/:color/echo', echoGreen)
+        app.mapRoute('GET', '/green/echo?a=1&b=2')
         // => {
         //   path: '/green/echo?a=1&b=2',
         //   name: '/:color/echo',
@@ -335,3 +346,5 @@ Todo
 - make RestifyqRest only relay events if listened for (to maintain correct semantics)
 - write requireParams(opts) that returns a middleware function that looks for
   required/optional/unknown params
+- double-check the restify compatibility calls, only pass the arguments
+  that exist!  else code that uses arguments.length will break
