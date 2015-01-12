@@ -93,20 +93,20 @@ With restiq:
 With restify:
 
         var restify = require('restify');
-	var app = restify.createServer();
+        var app = restify.createServer();
         app.use(restify.queryParser());
         app.use(restify.bodyParser());
         app.get('/echo', function(req, res, next) {
             res.send(200, req.params);
             next();
-	});
-	app.listen(1337);
+        });
+        app.listen(1337);
         // 4.3k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 Change just the first two lines to run it under restiq:
 
         var restify = require('restiq');
-	var app = restify.createServer({restify: 1});
+        var app = restify.createServer({restify: 1});
         // ...
         // 17.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
