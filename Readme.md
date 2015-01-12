@@ -29,6 +29,17 @@ Why yet another framework?  I wanted
   and there is no better way to learn than by doing
 
 
+Comparison
+----------
+
+A small echo server, parses and returns the url query parameters:
+
+- [restiq](https://www.npmjs.org/package/restiq) - 19.5k/s
+- [http](https://nodejs.org/api/http.html) - 17.6k/s
+- [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
+- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s (198/sec, to be precise)
+
+
 Overview
 --------
 
@@ -320,3 +331,7 @@ Todo
 - describe the built-in restify compatibily adapter
 - add an `app.after` stack to do common post-success processing
 - urldecode path params too (to allow embedded /)
+- make restiq apps emit the underlying http server events
+- make RestifyqRest only relay events if listened for (to maintain correct semantics)
+- write requireParams(opts) that returns a middleware function that looks for
+  required/optional/unknown params
