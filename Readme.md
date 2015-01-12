@@ -33,8 +33,15 @@ Overview
 --------
 
 An web service responds to requests sent to pathname-like addresses
-("routes").  The server looks up the computation associated with the route,
-runs it, and returns the generated response.
+("routes").  The server extracts the request parameters, looks up the
+computation associated with the route, runs it, and returns the generated
+response.
+
+Parameters can be embedded in the request path itself (path parameters),
+appended to the path in HTTP query string format (a `?` followed by
+'&'-separated name=value pairs, eg `?a=1&b=2`), or be in the request body in
+HTTP query string format or some other serialization format eg JSON or BSON.
+Restic knows about path params and on-path and in-body HTTP query params.
 
 The computation is composed of a series of steps (the "middleware stack"),
 each step a function taking a request, a response, and a callback to call to
@@ -43,7 +50,8 @@ sequence, each called after the preceding one has finished.
 
 The steps are highly configurable.  They can be run on a route-by-route basis
 or in common to all routes.  Steps in common can be either before or after the
-per-route steps.
+per-route steps.  In addition, steps can be configured to run after all other
+processing is complete even in case of errors.
 
 The Restiq request and responses are just node
 [`http.incomingMessage`](https://www.nodejs.org/api/http.html#http_http_incomingmessage)
@@ -81,7 +89,6 @@ With restiq:
         var Restiq = require('restiq');
         var app = Restiq.createServer();
         app.use(Restiq.mw.parseQueryParams);
-        app.use(Restiq.mw.parseBodyParams);
         app.addRoute('GET', '/echo', [
             function(req, res, next) {
                 res.writeHeader(200, {'Content-Type': 'application/json'});
@@ -97,24 +104,23 @@ With restify:
         var restify = require('restify');
         var app = restify.createServer();
         app.use(restify.queryParser());
-        app.use(restify.bodyParser());
         app.get('/echo', function(req, res, next) {
             res.send(200, req.params);
             next();
         });
         app.listen(1337);
-        // 4.3k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 4.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 Change just the first two lines to run it under restiq:
 
         var restify = require('restiq');
         var app = restify.createServer({restify: 1});
         // ...
-        // 17.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 18.1k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 Surprisingly, yes it is possible to build on top of http and achieve better
 throughput than a canonical http server as shown above.  Because regexes are
-so fast in node, extracting query path params runs even faster.  (Timed with
+very fast in node, extracting path params is only 5% slower.  (Timed with
 node-v0.10.29 on an AMD 3.6 GHz 4x Phenom II.)
 
 
@@ -191,9 +197,12 @@ For example
         //   path: '/green/echo?a=1&b=2',
         //   name: '/:color/echo',
         //   tail: '?a=1&b=2',
-        //   vars: {a: 1, b: 2},
+        //   vars: {color: "green"},
         //   handlers: [echoGreen]
         // }
+
+Note getting the route extracts only the path params; the query string
+params can be gotten with `app.mw.parseQueryParams()`.
 
 ### Restiq.mw
 
@@ -284,18 +293,30 @@ Tips
 
 Random observations on building fast REST services
 
-- REST path params are faster to extract than query string params
-- passing just REST or just GET params is faster than passing both
-- JSON is slower to encode and to parse than query strings
-- http has a speed-of-light of around 27k queries per second, with
-  plaintext responses, and empty request bodies.  Having to assemble the
-  body from the chunks limits http to under 23k calls/s
-
+- nodejs `http` has a speed-of-light of around 27k queries per second (empty
+  request body, plaintext response)
+- having to assemble the body from the chunks limits http to under 24.5k/s
+  (that's if not also parsing request params)
+- using req.on('data') to assemble the body drops the ceiling to under 19k/s.
+  It is much faster to req.read() in an setTimeout loop than to wait for
+  events.  Actual times are sensitive to node version, so check.
+- query string params are faster to use than REST path params (because routing
+  for static paths is a single hash lookup, vs a for loop over a list of
+  regexp objects).  Even though path params are faster to extract with a regexp
+  than parsing the query string, it does not make up for the routing latency.
+- this may be obvious, but passing just REST or just GET params is faster than
+  passing both
+- using `res.write()` to reply imposes a throttle of 25 requests per
+  connection.  Haven't tracked this one down yet, don't know of a remedy.
+  Workaround is to use `res.end()` and send the entire response in one go.
 
 Todo
 ----
 
 - unit tests
-- refactor all internal functions into methods for testability
-- write parseBodyObject to decode JSON and BSON request bodies
+- refactor internal functions into methods, for testability
+- would be handy to have decodeReqBody for decoding JSON and BSON request bodies
+- would be handy to have encodeResBody for encoding JSON and BSON response bodies
 - describe the built-in restify compatibily adapter
+- add an `app.after` stack to do common post-success processing
+- urldecode path params too (to allow embedded /)
