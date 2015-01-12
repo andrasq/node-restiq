@@ -21,14 +21,16 @@ Objectives
 
 Why yet another framework?  I wanted
 
-- to run as fast the node built-in http.createServer()
-- user-defined output formats
-- different output formats call by call
+- to run as fast the node built-in http.createServer() (or faster; see below)
+- user-defined output formats (tbd)
+- different output formats call by call (tbd)
 - fewer built-ins in favor of more add-ons
+- to better understand the components of nodejs web service implementations,
+  and there is no better way to learn than by doing
 
 
-Description
------------
+Overview
+--------
 
 An web service responds to requests sent to pathname-like addresses
 ("routes").  The server looks up the computation associated with the route,
