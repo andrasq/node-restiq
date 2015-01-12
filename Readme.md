@@ -3,12 +3,17 @@ restiq
 
 smaller, lighter, faster framework for REST API's, in the spirit of restify.
 
-Useful to serve 16k requests per second per thread, not 4k.  Intended for
-lean, fast micro-services; client requests maybe later.
+Lean and fast for low-latency micro-services where overhead is important.
+Depending on the app, can serve 20k requests / second or more, and 18k / sec
+for more complex apps.
 
-This is a work in progress.  The basics are in place -- route mapping, fast
-route decoding, pre-, post- and per-route stacks are working.  Errors are caught
-and converted into a 500 response.  Unmapped routes return 405 errors.
+The basics are in place -- route mapping, fast route decoding, pre-, post- and
+per-route stacks are working.  Errors are caught and converted into HTTP 500
+responses.  Unmapped routes return 405 errors.  The calls themselves can
+return any HTTP status code.
+
+There are not a lot of frills yet, but I was able to swap out restify in a
+fairly complex project and have all its unit tests pass.
 
 
 Objectives
@@ -21,34 +26,6 @@ Why yet another framework?  I wanted
 - different output formats call by call
 - fewer built-ins in favor of more add-ons
 
-
-Example
--------
-
-        var Restiq = require('restiq');
-        var app = Restiq.createServer();
-        app.pre(Restiq.mw.parseQueryParams);
-        app.addRoute('GET', '/echo', [
-            function(req, res, next) {
-                res.writeHeaders(200, {'Content-Type': 'application/json'}),
-                res.end(JSON.stringify(req.params)),
-                next();
-            }
-        ]);
-        app.listen(8080);
-
-        // wrk -d20s -t2 -c8 'http://localhost:8080/echo?a=1&b=2&c=3&d=4&e=5'
-        // => 18.9k requests / second (54.3k/s cluster of 3)
-
-
-Tips
-----
-
-Some notes on how to build fast fast services
-
-- REST path params are faster to extract than query string params
-- passing just REST or just GET params is faster than passing both
-- JSON is slower to encode and to parse than query strings
 
 Description
 -----------
@@ -66,18 +43,77 @@ The steps are highly configurable.  They can be run on a route-by-route basis
 or in common to all routes.  Steps in common can be either before or after the
 per-route steps.
 
-        app = Restiq.createServer();
-        app.pre(stepBefore
-
 The Restiq request and responses are just node
 [`http.incomingMessage`](https://www.nodejs.org/api/http.html#http_http_incomingmessage)
 and
 [`http.ServerResponse`](https://www.nodejs.org/api/http.html#http_class_http_serverresponse)
 objects.
 
-Will eventually include a thin compatibility layer for shimming simple
+Restiq includes a thin compatibility layer for shimming simple
 [`restify`](https://www.npmjs.org/package/restify)
 applications onto Restiq.
+
+
+Examples
+--------
+
+With http:
+
+        var http = require('http');
+        var querystring = require('querystring');
+        var server = http.createServer(function(req, res) {
+            req.data = "";
+            req.on('data', function(chunk) { req.data += chunk; });
+            req.on('end', function() {
+                var url = req.url, qs = url.indexOf('?');
+                if (qs >= 0) req.params = querystring.parse(url.slice(qs+1));
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(req.params));
+            });
+        });
+        server.listen(1337, '127.0.0.1');
+        // 17.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+
+With restiq:
+
+        var Restiq = require('restiq');
+        var app = Restiq.createServer();
+        app.use(Restiq.mw.parseQueryParams);
+        app.use(Restiq.mw.parseBodyParams);
+        app.addRoute('GET', '/echo', [
+            function(req, res, next) {
+                res.writeHeader(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(req.params));
+                next();
+            }
+        ]);
+        app.listen(1337);
+        // 19.5k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+
+With restify:
+
+        var restify = require('restify');
+	var app = restify.createServer();
+        app.use(restify.queryParser());
+        app.use(restify.bodyParser());
+        app.get('/echo', function(req, res, next) {
+            res.send(200, req.params);
+            next();
+	});
+	app.listen(1337);
+        // 4.3k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+
+Change just the first two lines to run it under restiq:
+
+        var restify = require('restiq');
+	var app = restify.createServer({restify: 1});
+        // ...
+        // 17.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+
+Surprisingly, yes it is possible to build on top of http and achieve better
+throughput than a canonical http server as shown above.  Because regexes are
+so fast in node, extracting query path params runs even faster.  (Timed with
+node-v0.10.29 on an AMD 3.6 GHz 4x Phenom II.)
 
 
 Methods
@@ -114,10 +150,11 @@ steps have all finished.
 
 ### app.finally( func )
 
-add shared middleware step to be called after every request.  The finally
-steps are run regardless, even if the call errored out.
+add shared middleware step to be called after every `pre()`, `use()` and route
+handler has run.  The finally steps are run regardless, even if the call
+errored out.
 
-### app.addRoute( method, path, func )
+### app.addRoute( method, path, handlers )
 
 register a path along with a function (or array of functions) to handle
 requests for it.  Requesting a path that has not been registered or calling a
@@ -166,7 +203,8 @@ precedence.
 #### Restiq.mw.parseBodyParams( req, res, next )
 
 merge the query string parameters from the body into req.params.  Will read
-the body with mw.readBody if it has not been read already.
+the body with mw.readBody if it has not been read already.  Does not parse
+JSON or BSON bodies, just HTTP query strings.
 
 #### Restiq.mw.readBody( req, res, next )
 
@@ -181,8 +219,30 @@ for the on('end') event.  Be careful when using this:  if the request has a
 body it needs to be consumed.
 
 
+Restify Compatibility Layer
+---------------------------
+
+(mostly working I guess, my restify app runs on top of restiq; specifics
+forthcoming)
+
+
+Tips
+----
+
+Random observations on building fast REST services
+
+- REST path params are faster to extract than query string params
+- passing just REST or just GET params is faster than passing both
+- JSON is slower to encode and to parse than query strings
+- http has a speed-of-light of around 27k queries per second, with
+  plaintext responses, and empty request bodies.  Having to assemble the
+  body from the chunks limits http to under 23k calls/s
+
+
 Todo
 ----
 
 - unit tests
 - refactor all internal functions into methods for testability
+- write parseBodyObject to decode JSON and BSON request bodies
+- describe the built-in restify compatibily adapter
