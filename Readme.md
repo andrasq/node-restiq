@@ -185,4 +185,4 @@ Todo
 ----
 
 - unit tests
-
+- refactor all internal functions into methods for testability
