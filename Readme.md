@@ -124,7 +124,7 @@ With restiq:
             }
         ]);
         app.listen(1337);
-        // 19.5k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 20.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 With restify:
 
@@ -143,7 +143,7 @@ Change just the first two lines to run it under restiq:
         var restify = require('restiq');
         var app = restify.createServer({restify: 1});
         // ...
-        // 18.1k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 19.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 Surprisingly, yes it is possible to build on top of http and achieve better
 throughput than a canonical http server as shown above.  Because regexes are
@@ -162,6 +162,8 @@ The options:
 
 - `debug` - include stack traces in error responses.  Be cautious about
    sending backtraces off-site.
+- `setNoDelay` - turn off Nagle write-combining on the current socket.
+  This can greatly reduces call latency when responses use write().
 - `restify` - make the response have methods `res.send` for easier
    compatibility with restify.  This eats into the throughput some, so
    use only as needed.
