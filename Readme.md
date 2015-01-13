@@ -347,7 +347,6 @@ Todo
 - would be handy to have decodeReqBody for decoding JSON and BSON request bodies
 - would be handy to have encodeResBody for encoding JSON and BSON response bodies
 - describe the built-in restify compatibily adapter
-- add an `app.after` stack to do common post-success processing
 - urldecode path params too (to allow embedded /)
 - make restiq apps emit the underlying http server events
 - make RestifyqRest only relay events if listened for (to maintain correct semantics)
