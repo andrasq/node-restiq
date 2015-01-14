@@ -34,7 +34,7 @@ Comparison
 
 A small echo server, parses and returns the url query parameters:
 
-- [restiq](https://www.npmjs.org/package/restiq) - 19.5k/s
+- [restiq](https://www.npmjs.org/package/restiq) - 20.8k/s
 - [http](https://nodejs.org/api/http.html) - 17.6k/s
 - [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
 - [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* or 1.8k/s with `setNoDelay()`
