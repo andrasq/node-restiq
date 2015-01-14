@@ -163,10 +163,13 @@ The options:
 - `debug` - include stack traces in error responses.  Be cautious about
    sending backtraces off-site.
 - `setNoDelay` - turn off Nagle write-combining on the current socket.
-  This can greatly reduces call latency when responses use write().
+   This can greatly reduces call latency when responses use write().
 - `restify` - make the response have methods `res.send` for easier
    compatibility with restify.  This eats into the throughput some, so
    use only as needed.
+- `createServer` - the function to use to create the server.  It will be
+   called with the function(req, res) that processes web requests.
+   Exposed for testing, this defaults to `http.createServer`.
 
         var Restiq = require('restiq');
         var app = Restiq.createServer(options);
@@ -355,3 +358,4 @@ Todo
 - double-check the restify compatibility calls, only pass the arguments
   that exist!  else code that uses arguments.length will break
 - make send() set Content-Length
+- make request processing time out to close the connection (w/o response) after ? 60 sec ?

@@ -1,4 +1,47 @@
+var http = require('http');
+var url = require('url');
 var Restiq = require('../index');
+var qmock = require('qmock');
+
+//
+// TODO: move HttpClient functionality into restiq
+// TODO: decode the response a bit nicer than a raw IncomingMessge
+//
+var HttpClient = {};
+HttpClient._call = function(uri, method, body, cb) {
+    if (!cb && typeof body === 'function') { cb = body; body = ""; }
+    var options = (typeof uri === 'string' ? url.parse(uri) : uri);
+    options.method = method;
+    options.headers = options.headers || {};
+    // TODO: this content encoding logic should be in Restiq.mw,
+    // to be reusable (and overridable).  Eg. mw.encodeResponse(),
+    // keying off .getHeader('content-type')
+    if (!body || typeof body === 'string') {
+        options.headers['Content-Type'] = 'text/plain';
+        body = body;
+    }
+    else if (Buffer.isBuffer(body)) {
+        options.headers['Content-Type'] = 'application/octet-stream';
+        body = JSON.stringify(body);
+    }
+    else {
+        options.headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(body);
+    }
+    var req = http.request(options, function(res) {
+        // end the connection, allow the server to exit on close().
+        // Unfortunately this leaves the socket in TIME_WAIT state for 60 sec.
+        // The response from a request is an http.IncomingMessage object,
+        // which can be decoded with mw.decodeRequestBody.
+        res.socket.end();
+        cb(res);
+    });
+    req.end(body);
+}
+HttpClient.get = function(uri, body, cb) { this._call(uri, 'GET', body, cb); }
+HttpClient.post = function(uri, body, cb) { this._call(uri, 'POST', body, cb); }
+HttpClient.put = function(uri, body, cb) { this._call(uri, 'PUT', body, cb); }
+HttpClient.del = function(uri, body, cb) { this._call(uri, 'DEL', body, cb); }
 
 module.exports = {
     'Restiq class': {
@@ -61,9 +104,21 @@ module.exports = {
                 t.done();
             });
         },
+
+        'should closeResponse with encodeResponseBody': function(t) {
+            var res = qmock.getMock({}, ['writeHead', 'end']);
+            res.body = {};
+            res.expects(qmock.any()).method('getHeader').will(qmock.returnValue(undefined));
+            res.expects(qmock.once()).method('end').with("{}");
+            t.expect(1);
+            Restiq.mw.closeResponse({}, res, function(){
+                t.ok(qmock.check(res));
+                t.done();
+            });
+        },
     },
 
-    'restiq app': {
+    'restiq app setup': {
         setUp: function(done) {
             this.app = Restiq.createServer();
             done();
@@ -71,8 +126,21 @@ module.exports = {
 
         'should start on listen, end on close': function(t) {
             var app = this.app;
-            t.expect(1);
+            t.expect(2);
             var ok = this.app.listen(21337, function(err) {
+                t.ifError(err);
+                app.close(function() {
+                    t.ok(1);
+                    t.done();
+                });
+            });
+        },
+
+        'should reject unmapped routes': function(t) {
+            var app = this.app;
+            t.expect(2);
+            var ok = this.app.listen(21337, function(err) {
+                t.ifError(err);
                 app.close(function() {
                     t.ok(1);
                     t.done();
@@ -108,6 +176,62 @@ module.exports = {
             t.equal(route.vars.x, 1);
             t.equal(route.vars.y, 2);
             t.done();
+        },
+    },
+
+    'restic app middleware': {
+        setUp: function(done) {
+            var self = this;
+            this.app = Restiq.createServer();
+            this.app.finally(Restiq.mw.closeResponse);
+            done();
+        },
+
+        'should run pre steps': function(t) {
+            var app = this.app;
+            t.expect(3);
+            app.pre(function(req, res, next){
+                t.ok(1);
+                next();
+            });
+            app.addRoute('GET', '/echo', []);
+            app.listen(21337, function(err){
+                t.ifError(err);
+                HttpClient.get('http://127.0.0.1:21337/echo', function(res) {
+                    t.equal(res.statusCode, 200);
+                    app.close(function(){
+                        t.done();
+                    });
+                });
+            });
+        },
+
+        'should run steps in order': function(t) {
+            var req = qmock.getMock({}, []);
+            var res = qmock.getMock({}, []);
+            // TODO: make createServer mockable
+            //var run, app = Restiq.createServer({createServer: function(onConnect){ run = onConnect; }});
+            var app = this.app;
+            var order = [];
+            t.expect(2);
+            app.finally(function(req, res, next){ order.push('finally1'); next(); });
+            app.after(function(req, res, next){ order.push('after1'); next(); });
+            app.use(function(req, res, next){ order.push('use1'); next(); });
+            app.pre(function(req, res, next){ order.push('pre1'); next(); });
+            app.finally(function(req, res, next){ order.push('finally2'); next(); });
+            app.after(function(req, res, next){ order.push('after2'); next(); });
+            app.use(function(req, res, next){ order.push('use2'); next(); });
+            app.pre(function(req, res, next){ order.push('pre2'); next(); });
+            // run(req, req, function(){ ... });
+            app.addRoute('GET', '/echo', [ function(q,s,n){ order.push('app1'); n() }, function(q,s,n){ order.push('app2'); n() } ]);
+            app.listen(21337, function(err) {
+                t.ifError(err);
+                HttpClient.get('http://127.0.0.1:21337/echo', function(res) {
+                    t.deepEqual(order, ['pre1', 'pre2', 'use1', 'use2', 'app1', 'app2', 'after1', 'after2', 'finally1', 'finally2']);
+                    app.close();
+                    t.done();
+                });
+            });
         },
     },
 };
