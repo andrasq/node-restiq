@@ -163,7 +163,9 @@ The options:
 - `debug` - include stack traces in error responses.  Be cautious about
    sending backtraces off-site.
 - `setNoDelay` - turn off Nagle write-combining on the current socket.
-   This can greatly reduces call latency when responses use write().
+   This can greatly reduce call latency when responses use write()
+   over an internal low-latency network.  Do NOT disable Nagle for
+   responses sent over the public internet.
 - `restify` - make the response have methods `res.send` for easier
    compatibility with restify.  This eats into the throughput some, so
    use only as needed.
@@ -339,8 +341,8 @@ Random observations on building fast REST services
 - this may be obvious, but passing just REST or just GET params is faster than
   passing both
 - using `res.write()` to reply imposes a throttle of 25 requests per
-  connection.  Haven't tracked this one down yet, don't know of a remedy.
-  Workaround is to use `res.end()` and send the entire response in one go.
+  connection.  Workaround is to set `res.socket.setNoDelay()` to disable the
+  TCP/IP Nagle write combining.  Only disable for local traffic.
 
 Todo
 ----
@@ -359,3 +361,15 @@ Todo
   that exist!  else code that uses arguments.length will break
 - make send() set Content-Length
 - make request processing time out to close the connection (w/o response) after ? 60 sec ?
+- call versioning?
+- add app.set(), app.get(), app.delete() methods for key/value properties
+- app.use() has a two-argument form?  (path, handler) ?
+- missing app.head() method
+- key off of "Accept: text/plain" etc headers for encoding format to use
+- ? allow routing regexp routes ?
+- handle both base64 and json-array Buffer (binary) data
+- build the std errors with Function(), to create actual named constructor functions
+- should support gzipped responses, 'Accept-Encoding: gzip' (chunked only!)
+- req.header(name, defaultValue)
+- expose reg.log to mw functions
+- FIX param parsing to omit the #search part the url

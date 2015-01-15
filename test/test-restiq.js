@@ -112,7 +112,7 @@ module.exports = {
             res.expects(qmock.once()).method('end').with("{}");
             t.expect(1);
             Restiq.mw.closeResponse({}, res, function(){
-                t.ok(qmock.check(res));
+                t.ok(!res.check());
                 t.done();
             });
         },
