@@ -44,7 +44,7 @@ A small echo server, parses and returns the url query parameters:
 \* - there is a res.write() issue with http.ServerResponse.  Calls writing or
      piping the response run at precisely 25 requests/second per connection.
      It is very easily reproducible; the fix is to add a
-     `res.socket.setNoDelay()` into the request handler (see below).
+     `res.socket.setNoDelay()` into the response handler.
 
 <!--
         // example of http res.write() bottleneck
@@ -185,6 +185,13 @@ start the service.  If given, confirmationCallback will be invoked when
 the service is ready to receive requests.  Hostname and backlog as for
 `http.createServer`.
 
+### app.setup( func )
+
+add shared middleware step to be called before every request before it is
+routed.  Setup steps are called in the order added.  This is where route
+aliasing, route editing can be inserted.  TODO: perhaps merge this and pre()
+into a single call?
+
 ### app.pre( func )
 
 add shared middleware step to be called before every request.  Pre steps
@@ -197,9 +204,9 @@ steps have all finished.
 
 ### app.finally( func )
 
-add shared middleware step to be called after every `pre()`, `use()` and route
-handler has run.  The finally steps are run regardless, even if the call
-errored out.
+add shared middleware step to be called after every other applicable
+middleware step has run.  The finally steps are run regardless, even if the
+middleware chain errors out part-way.
 
 ### app.addRoute( method, path, handlers )
 
@@ -214,9 +221,9 @@ parameters are extracted and stored into req.params (see also
 
 For restify compatibility, mapped routes execute those `use` steps that
 existed when the route was mapped.  In the sequence `use`, `use`, `map(1)`,
-`use`, `map(2)`, calls that request the first mapped route will run only the
-first two `use` steps, but calls that request the second mapped route will run
-all three.  All calls will run all `finally` steps (if any).
+`use`, `map(2)`, calls that request route 1 will run only the first two `use`
+steps, but calls that request route 2 will run all three.  All calls will run
+all `finally` steps (if any).
 
 ### app.mapRoute( method, path )
 
@@ -375,6 +382,6 @@ Todo
 - should support gzipped responses, 'Accept-Encoding: gzip' (chunked only!)
 - req.header(name, defaultValue)
 - expose reg.log to mw functions
-- FIX param parsing to omit the #search part the url
-- make pre() run before route lookup, to move route processing into the middleware
-  (eg, to better support application-specific versioning, route aliasing/editing)
+- check pre() semantics, see if can be merged into setup()
+- split rlib into misc and mw
+- move restify compat code out of restiq into separate file
