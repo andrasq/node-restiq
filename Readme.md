@@ -7,13 +7,14 @@ Lean and fast for low-latency micro-services where overhead is important.
 Depending on the app, can serve 20k requests / second or more, and 18k / sec
 for more complex apps.
 
-The basics are in place -- route mapping, fast route decoding, pre-, post- and
-per-route stacks are working.  Errors are caught and converted into HTTP 500
+The basics are working -- route mapping, route decoding, pre-, post- and
+per-route middleware stacks.  Errors are caught and converted into HTTP 500
 responses.  Unmapped routes return 405 errors.  The calls themselves can
 return any HTTP status code.
 
 There are not a lot of frills yet, but I was able to swap out restify in a
-fairly complex project and have all its unit tests pass.
+fairly complex app and have all its unit tests pass.  The app runs 25-30% more
+calls per second on restiq than before.
 
 
 Objectives
@@ -45,6 +46,7 @@ A small echo server, parses and returns the url query parameters:
      It is very easily reproducible; the fix is to add a
      `res.socket.setNoDelay()` into the request handler (see below).
 
+<!--
         // example of http res.write() bottleneck
         var server = http.createServer( function(req, res) {
             res.socket.setNoDelay();    // compare with and without setNoDelay
@@ -55,6 +57,7 @@ A small echo server, parses and returns the url query parameters:
             });
         });
         server.listen(1337);
+-->
 
 Overview
 --------
@@ -94,7 +97,12 @@ applications onto Restiq.
 Examples
 --------
 
-With http:
+Surprisingly, it is possible to build on top of http and achieve better
+throughput than a canonical http server as shown below.  Because regexes are
+very fast in node, extracting path params is only 5% slower.  (Timed with
+node-v0.10.29 on an AMD 3.6 GHz 4x Phenom II.)
+
+Canonical server using http:
 
         var http = require('http');
         var querystring = require('querystring');
@@ -144,11 +152,6 @@ Change just the first two lines to run it under restiq:
         var app = restify.createServer({restify: 1});
         // ...
         // 19.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
-
-Surprisingly, yes it is possible to build on top of http and achieve better
-throughput than a canonical http server as shown above.  Because regexes are
-very fast in node, extracting path params is only 5% slower.  (Timed with
-node-v0.10.29 on an AMD 3.6 GHz 4x Phenom II.)
 
 
 Methods
@@ -373,3 +376,5 @@ Todo
 - req.header(name, defaultValue)
 - expose reg.log to mw functions
 - FIX param parsing to omit the #search part the url
+- make pre() run before route lookup, to move route processing into the middleware
+  (eg, to better support application-specific versioning, route aliasing/editing)
