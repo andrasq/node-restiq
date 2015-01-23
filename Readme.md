@@ -242,14 +242,14 @@ The mapped route includes the requested `path`, the matching route `name`, the
 
 For example
 
-        app.addRoute('GET', '/:color/echo', echoGreen)
+        app.addRoute('GET', '/:color/echo', echoColor)
         app.mapRoute('GET', '/green/echo?a=1&b=2')
         // => {
         //   path: '/green/echo?a=1&b=2',
         //   name: '/:color/echo',
         //   tail: '?a=1&b=2',
         //   vars: {color: "green"},
-        //   handlers: [echoGreen]
+        //   handlers: [echoColor]
         // }
 
 Note getting the route extracts only the path params; the query string
