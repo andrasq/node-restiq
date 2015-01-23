@@ -337,8 +337,8 @@ returns the options.version string that was passed to createServer()
 
 ### req.header( name, [defaultValue] )
 
-return the named header field, or defaultValue if was not specified in the
-request
+return the named header field, or defaultValue if that header field was not
+specified in the request
 
 ### res.header( name, value )
 
