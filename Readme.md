@@ -268,7 +268,7 @@ merge the query string parameters into req.params
 
 merge the parameters embedded in the request path into req.params.  This is
 done automatically as soon as the route is mapped, but explicit param parsing
-can override these value.  Re-merging allows control of the param source
+can override these values.  Re-merging allows control of the param source
 precedence.
 
 ### Restiq.mw.parseBodyParams( req, res, next )
@@ -414,3 +414,5 @@ Todo
 - split rlib into misc and mw
 - move restify compat code out of restiq into separate file
 - come up with better mw chain section names than setup, after, finally
+- write basicAuth() middleware library step
+- (Q: how to pass app state in to steps? attach app to req? or ...cleaner?)
