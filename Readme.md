@@ -335,6 +335,11 @@ restiq uses a dash `-` if can't find one, and  does not make one up.
 
 returns the options.version string that was passed to createServer()
 
+### req.header( name, [defaultValue] )
+
+return the named header field, or defaultValue if was not specified in the
+request
+
 ### res.header( name, value )
 
 set a header value, aka writeHeader
