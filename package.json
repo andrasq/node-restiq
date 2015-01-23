@@ -1,6 +1,6 @@
 {
   "name": "restiq",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "smaller, faster, lighter-weight REST micro-framework",
   "license": "Apache-2.0",
   "main": "index.js",
