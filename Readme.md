@@ -197,7 +197,7 @@ The middleware sections are:
 - `setup`, shared steps before the call is routed
 - `pre`, shared steps before the call is run
 - `use`, partially shared steps before the route handlers are run
-- `the` route handlers, installed with addRoute
+- (the route handlers, installed with `addRoute`)
 - `after`, shared steps after the call successfully finished
 - `finally`, shared steps run in every case after all other steps have finished
 
