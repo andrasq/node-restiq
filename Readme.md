@@ -255,34 +255,35 @@ For example
 Note getting the route extracts only the path params; the query string
 params can be gotten with `app.mw.parseQueryParams()`.
 
-### Restiq.mw
+Restiq.mw
+---------
 
 A library of pre-written middleware utility functions.
 
-#### Restiq.mw.parseQueryParams( req, res, next )
+### Restiq.mw.parseQueryParams( req, res, next )
 
 merge the query string parameters into req.params
 
-#### Restiq.mw.parseRouteParams( req, res, next )
+### Restiq.mw.parseRouteParams( req, res, next )
 
 merge the parameters embedded in the request path into req.params.  This is
 done automatically as soon as the route is mapped, but explicit param parsing
 can override these value.  Re-merging allows control of the param source
 precedence.
 
-#### Restiq.mw.parseBodyParams( req, res, next )
+### Restiq.mw.parseBodyParams( req, res, next )
 
 merge the query string parameters from the body into req.params.  Will read
 the body with mw.readBody if it has not been read already.  Does not parse
 JSON or BSON bodies, just HTTP query strings.
 
-#### Restiq.mw.readBody( req, res, next )
+### Restiq.mw.readBody( req, res, next )
 
 gather up the message that was sent with the http request, and save it in
 req.body.  This call is safe to call more than once, but sets body only the
 first time.
 
-#### Restiq.mw.skipBody( req, res, next )
+### Restiq.mw.skipBody( req, res, next )
 
 if the request body is guaranteed to be empty, it is faster to skip waiting
 for the on('end') event.  Be careful when using this:  if the request has a
