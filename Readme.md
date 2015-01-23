@@ -185,28 +185,35 @@ start the service.  If given, confirmationCallback will be invoked when
 the service is ready to receive requests.  Hostname and backlog as for
 `http.createServer`.
 
-### app.setup( func )
+### app.addStep( func, [where] )
 
-add shared middleware step to be called before every request before it is
-routed.  Setup steps are called in the order added.  This is where route
-aliasing, route editing can be inserted.  TODO: perhaps merge this and pre()
-into a single call?
+add a processing step to the middleware stack.  Each step is a function
+`step(req, res, next)` taking request, response and a next-step callback.  The
+optional `where` specifies in which section of the middleware chain to insert
+the step; the default is 'use'.
 
-### app.pre( func )
+The middleware sections are:
 
-add shared middleware step to be called before every request.  Pre steps
-are called in the order added.
+- `setup`, shared steps before the call is routed
+- `pre`, shared steps before the call is run
+- `use`, partially shared steps before the route handlers are run
+- `the` route handlers, installed with addRoute
+- `after`, shared steps after the call successfully finished
+- `finally`, shared steps run in every case after all other steps have finished
 
-### app.use( func )
+Middleware steps are run in the above section order, and steps within a
+section are run in the order added.  Shared steps are run by all calls.  Use
+steps are partially shared, and are run by only those routes that were added
+after the use step had already been added.  Ie if use step and routes are
+added interleaved, not all routes will run all use steps; all routes will run
+those use steps that are added before the first route is added.  The route
+handler steps are defined per route and added with `addRoute()`.
 
-add shared middleware step to be called before every request after the `pre()`
-steps have all finished.
-
-### app.finally( func )
-
-add shared middleware step to be called after every other applicable
-middleware step has run.  The finally steps are run regardless, even if the
-middleware chain errors out part-way.
+The setup steps provide an opportunity to edit the route, ie implement route
+aliasing, version mapping, etc.  The pre, use and routed steps implement the
+call processing proper.  The after steps are for shared post-call wrapup, for
+successful calls.  The finally steps are run as the call teardown, and can do
+the logging, analytics reporting, etc.
 
 ### app.addRoute( method, path, handlers )
 
@@ -286,6 +293,22 @@ Restify Compatibility Layer
 ---------------------------
 
 This is what I have so far --
+
+### app.pre( func )
+
+add shared middleware step to be called before every request.  Pre steps
+are called in the order added.
+
+### app.use( func )
+
+add shared middleware step to be called before every request after the `pre()`
+steps have all finished.
+
+### app.finally( func )
+
+add shared middleware step to be called after every other applicable
+middleware step has run.  The finally steps are run regardless, even if the
+middleware chain errors out part-way.
 
 ### app.get( path, handler, [handler2, ...] )
 
@@ -380,8 +403,8 @@ Todo
 - handle both base64 and json-array Buffer (binary) data
 - build the std errors with Function(), to create actual named constructor functions
 - should support gzipped responses, 'Accept-Encoding: gzip' (chunked only!)
-- req.header(name, defaultValue)
 - expose reg.log to mw functions
 - check pre() semantics, see if can be merged into setup()
 - split rlib into misc and mw
 - move restify compat code out of restiq into separate file
+- come up with better mw chain section names than setup, after, finally
