@@ -196,7 +196,6 @@ default is 'use'.
 The middleware sections are:
 
 - `setup`, shared steps before the call is routed
-- `pre`, shared steps before the call is run
 - `use`, partially shared steps before the route handlers are run
 - (the route handlers, installed with `addRoute`)
 - `after`, shared steps after the call successfully finished
@@ -211,7 +210,7 @@ those use steps that are added before the first route is added.  The route
 handler steps are defined per route and added with `addRoute()`.
 
 The setup steps provide an opportunity to edit the route, ie implement route
-aliasing, version mapping, etc.  The pre, use and routed steps implement the
+aliasing, version mapping, etc.  The use and route steps implement the
 call processing proper.  The after steps are for shared post-call wrapup, for
 successful calls.  The finally steps are run as the call teardown, and can do
 the logging, analytics reporting, etc.
@@ -393,7 +392,6 @@ Todo
   required/optional/unknown params
 - double-check the restify compatibility calls, only pass the arguments
   that exist!  else code that uses arguments.length will break
-- FIX: make send() set Content-Length
 - make request processing time out to close the connection (w/o response) after ? 60 sec ?
 - call versioning?
 - add app.set(), app.get(), app.delete() methods for key/value properties
@@ -421,7 +419,6 @@ Todo
 - compat: re-emit all events from http.Server
 - compat: emit restify error events, see http://mcavage.me/node-restify/ #Server+Api
 - compat: expose address(), listen(), close()
-- FIX: pre is identical to setup (nb: no req.params yet).  Clean up internal _preCount.
   => alias before() and after() ? or setup() and teardown() ?
 - compat: make parsed query params available in req.query
 - speedup: pre-declare appended fields on http.IncomingMessage prototype

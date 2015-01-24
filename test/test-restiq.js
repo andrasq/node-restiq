@@ -217,19 +217,17 @@ module.exports = {
             app.addStep(function(req, res, next){ order.push('finally1'); next(); }, 'finally');
             app.addStep(function(req, res, next){ order.push('after1'); next(); }, 'after');
             app.addStep(function(req, res, next){ order.push('use1'); next(); }, 'use');
-            app.addStep(function(req, res, next){ order.push('pre1'); next(); }, 'pre');
             app.addStep(function(req, res, next){ order.push('setup1'); next(); }, 'setup');
             app.addStep(function(req, res, next){ order.push('finally2'); next(); }, 'finally');
             app.addStep(function(req, res, next){ order.push('after2'); next(); }, 'after');
             app.addStep(function(req, res, next){ order.push('use2'); next(); }, 'use');
             app.addStep(function(req, res, next){ order.push('setup2'); next(); }, 'setup');
-            app.addStep(function(req, res, next){ order.push('pre2'); next(); }, 'pre');
             // run(req, req, function(){ ... });
             app.addRoute('GET', '/echo', [ function(q,s,n){ order.push('app1'); n() }, function(q,s,n){ order.push('app2'); n() } ]);
             app.listen(21337, function(err) {
                 t.ifError(err);
                 HttpClient.get('http://127.0.0.1:21337/echo', function(res) {
-                    t.deepEqual(order, ['setup1', 'setup2', 'pre1', 'pre2',
+                    t.deepEqual(order, ['setup1', 'setup2',
                                         'use1', 'use2', 'app1', 'app2',
                                         'after1', 'after2', 'finally1', 'finally2']);
                     app.close();
