@@ -35,7 +35,7 @@ Comparison
 
 A small echo server, parses and returns the url query parameters:
 
-- [restiq](https://www.npmjs.org/package/restiq) - 23.0k/s
+- [restiq](https://www.npmjs.org/package/restiq) - 20.8k/s
 - [http](https://nodejs.org/api/http.html) - 17.6k/s
 - [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
 - [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* or 1.8k/s with `setNoDelay()`
@@ -132,7 +132,7 @@ With restiq:
             }
         ]);
         app.listen(1337);
-        // 23.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 20.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 With restify:
 
@@ -151,7 +151,7 @@ Change just the first two lines to run it under restiq:
         var restify = require('restiq');
         var app = restify.createServer({restify: 1});
         // ...
-        // 20.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 17.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 
 Methods
