@@ -35,7 +35,7 @@ Comparison
 
 A small echo server, parses and returns the url query parameters:
 
-- [restiq](https://www.npmjs.org/package/restiq) - 20.8k/s
+- [restiq](https://www.npmjs.org/package/restiq) - 23.0k/s
 - [http](https://nodejs.org/api/http.html) - 17.6k/s
 - [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
 - [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* or 1.8k/s with `setNoDelay()`
@@ -132,7 +132,7 @@ With restiq:
             }
         ]);
         app.listen(1337);
-        // 20.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 23.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 With restify:
 
@@ -151,7 +151,7 @@ Change just the first two lines to run it under restiq:
         var restify = require('restiq');
         var app = restify.createServer({restify: 1});
         // ...
-        // 19.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 20.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 
 Methods
@@ -188,9 +188,10 @@ the service is ready to receive requests.  Hostname and backlog as for
 ### app.addStep( func, [where] )
 
 add a processing step to the middleware stack.  Each step is a function
-`step(req, res, next)` taking request, response and a next-step callback.  The
-optional `where` specifies in which section of the middleware chain to insert
-the step; the default is 'use'.
+`step(req, res, next)` taking request, response and a next-step callback.
+`func` is a step function or an array of step functions. The optional `where`
+specifies in which section of the middleware chain to insert the step; the
+default is 'use'.
 
 The middleware sections are:
 
@@ -305,12 +306,6 @@ are called in the order added.
 add shared middleware step to be called before every request after the `pre()`
 steps have all finished.
 
-### app.finally( func )
-
-add shared middleware step to be called after every other applicable
-middleware step has run.  The finally steps are run regardless, even if the
-middleware chain errors out part-way.
-
 ### app.get( path, handler, [handler2, ...] )
 
 add a GET route, with handlers to run in the order listed
@@ -398,7 +393,7 @@ Todo
   required/optional/unknown params
 - double-check the restify compatibility calls, only pass the arguments
   that exist!  else code that uses arguments.length will break
-- make send() set Content-Length
+- FIX: make send() set Content-Length
 - make request processing time out to close the connection (w/o response) after ? 60 sec ?
 - call versioning?
 - add app.set(), app.get(), app.delete() methods for key/value properties
@@ -416,3 +411,22 @@ Todo
 - come up with better mw chain section names than setup, after, finally
 - write basicAuth() middleware library step
 - (Q: how to pass app state in to steps? attach app to req? or ...cleaner?)
+- ? accept routeName handlers, to hand off to another call (... conditionally??)
+- compat: look for Accept-Version: header (and InvalidVersion error)
+- res.send() should use registered formatters (default is the first one listed)
+- separate output formatting from Content-Type: allow for a post-formatting step
+  to subsequently change the content type.  Look for _isFormatted = true.
+  This also allows for pluggable mw formatters, for per-call formats (eg, json
+  for data, plaintext for metadata)
+- compat: re-emit all events from http.Server
+- compat: emit restify error events, see http://mcavage.me/node-restify/ #Server+Api
+- compat: expose address(), listen(), close()
+- FIX: pre is identical to setup (nb: no req.params yet).  Clean up internal _preCount.
+  => alias before() and after() ? or setup() and teardown() ?
+- compat: make parsed query params available in req.query
+- speedup: pre-declare appended fields on http.IncomingMessage prototype
+- ? make readBody support a max body size limit ?
+- ? offer mw step builders, to accept params?  eg mw.buildReadBody({maxBodySize: 1000}) vs mw.readBody;
+- speed: time w/ bunyan vs w/ qlogger
+- decorate req with .restiq (and restiq with .route)
+- add get/set/peek methods on .restiq, for retrieving app state
