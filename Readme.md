@@ -403,11 +403,8 @@ Todo
 - build the std errors with Function(), to create actual named constructor functions
 - should support gzipped responses, 'Accept-Encoding: gzip' (chunked only!)
 - expose reg.log to mw functions
-- check pre() semantics, see if can be merged into setup()
 - split rlib into misc and mw
 - move restify compat code out of restiq into separate file
-- come up with better mw chain section names than setup, after, finally
-- write basicAuth() middleware library step
 - (Q: how to pass app state in to steps? attach app to req? or ...cleaner?)
 - ? accept routeName handlers, to hand off to another call (... conditionally??)
 - compat: look for Accept-Version: header (and InvalidVersion error)
@@ -421,7 +418,6 @@ Todo
 - compat: expose address(), listen(), close()
   => alias before() and after() ? or setup() and teardown() ?
 - compat: make parsed query params available in req.query
-- speedup: pre-declare appended fields on http.IncomingMessage prototype
 - ? make readBody support a max body size limit ?
 - ? offer mw step builders, to accept params?  eg mw.buildReadBody({maxBodySize: 1000}) vs mw.readBody;
 - speed: time w/ bunyan vs w/ qlogger
