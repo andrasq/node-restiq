@@ -175,6 +175,12 @@ The options:
 - `createServer` - the function to use to create the server.  It will be
    called with the function(req, res) that processes web requests.
    Exposed for testing, this defaults to `http.createServer`.
+- `readBinary` - when reading the request body, gather the chunks into
+   a Buffer instead of a utf8 string.  Gathering to string is faster,
+   but Buffers are more traditional for binary data.
+- `readTimeout` - when reading the request body, loop with setTimeout.
+   Define as falsy (0, false or null) to use setImmediate.  If this is
+   not specified, setTimeout is also the default.
 
         var Restiq = require('restiq');
         var app = Restiq.createServer(options);

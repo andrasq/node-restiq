@@ -37,7 +37,7 @@ HttpClient._call = function(uri, method, body, cb) {
         cb(res);
     });
     req.end(body);
-}
+};
 HttpClient.get = function(uri, body, cb) { this._call(uri, 'GET', body, cb); }
 HttpClient.post = function(uri, body, cb) { this._call(uri, 'POST', body, cb); }
 HttpClient.put = function(uri, body, cb) { this._call(uri, 'PUT', body, cb); }
@@ -149,7 +149,7 @@ module.exports = {
         },
 
         'should have expected mw add methods': function(t) {
-            var i, expect = ['addStep', 'addRoute', 'mapRoute', 'pre', 'use', 'finally', 'get', 'put', 'post', 'del'];
+            var i, expect = ['addStep', 'addRoute', 'mapRoute', 'pre', 'use', 'get', 'put', 'post', 'del'];
             for (i in expect) {
                 t.ok(typeof this.app[expect[i]] === 'function');
             }
@@ -183,7 +183,7 @@ module.exports = {
         setUp: function(done) {
             var self = this;
             this.app = Restiq.createServer();
-            this.app.finally(Restiq.mw.closeResponse);
+            this.app.addStep(Restiq.mw.closeResponse, 'finally');
             done();
         },
 
