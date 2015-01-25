@@ -424,3 +424,9 @@ Todo
 - decorate req with .restiq (and restiq with .route)
 - add get/set/peek methods on .restiq, for retrieving app state
 - revisit send(), support headers
+- FIX: under very heavy load (-d60s -t2 -c8 5-arg echo) throughput drops to 8k/s
+  (from 13k/s) and subsequent curl calls get the old data ?!  Repeatable with
+  node benchamark/benchmark.js emulate.  Curl -v shows the correct request,
+  the response timestamp is up to date.  Content-Length is correct for the
+  response, but the response is from the old requests.  Resident mem 536MB
+  (32-bit).
