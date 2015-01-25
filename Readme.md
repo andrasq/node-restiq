@@ -151,7 +151,7 @@ Change just the first two lines to run it under restiq:
         var restify = require('restiq');
         var app = restify.createServer({restify: 1});
         // ...
-        // 17.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 14.7k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 
 Methods
