@@ -423,3 +423,4 @@ Todo
 - speed: time w/ bunyan vs w/ qlogger
 - decorate req with .restiq (and restiq with .route)
 - add get/set/peek methods on .restiq, for retrieving app state
+- revisit send(), support headers
