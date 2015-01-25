@@ -35,7 +35,7 @@ Comparison
 
 A small echo server, parses and returns the url query parameters:
 
-- [restiq](https://www.npmjs.org/package/restiq) - 20.8k/s
+- [restiq](https://www.npmjs.org/package/restiq) - 21.5k/s
 - [http](https://nodejs.org/api/http.html) - 17.6k/s
 - [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
 - [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* or 1.8k/s with `setNoDelay()`
@@ -74,9 +74,9 @@ HTTP query string format or some other serialization format eg JSON or BSON.
 Restic knows about path params and on-path and in-body HTTP query params.
 
 The computation is composed of a series of steps (the "middleware stack"),
-each step a function taking a request, a response, and a callback to call to
-indicate that the step is finished, `(req, res, next)`.  The steps are run in
-sequence, each called after the preceding one has finished.
+each step a function taking the request, the response thus far, and a callback
+to call to indicate that the step is finished, `(req, res, next)`.  The steps
+are run in sequence, each called after the preceding one has finished.
 
 The steps are highly configurable.  They can be run on a route-by-route basis
 or in common to all routes.  Steps in common can be either before or after the
@@ -123,7 +123,7 @@ With restiq:
 
         var Restiq = require('restiq');
         var app = Restiq.createServer();
-        app.use(Restiq.mw.parseQueryParams);
+        app.addStep(Restiq.mw.parseQueryParams);
         app.addRoute('GET', '/echo', [
             function(req, res, next) {
                 res.writeHeader(200, {'Content-Type': 'application/json'});
@@ -132,7 +132,7 @@ With restiq:
             }
         ]);
         app.listen(1337);
-        // 20.8k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 21.5k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 With restify:
 
@@ -149,9 +149,9 @@ With restify:
 Change just the first two lines to run it under restiq:
 
         var restify = require('restiq');
-        var app = restify.createServer({restify: 1});
+        var app = restify.createServer({restify: true});
         // ...
-        // 14.7k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 16.1k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 
 Methods
@@ -325,7 +325,29 @@ add a PUT route, with handlers to run in the order listed
 
 ### app.del( path, handler, [handler2, ...] )
 
-add a DEL route, with handlers to run in the order listed
+add a DELETE route, with handlers to run in the order listed
+
+### Restiq.queryParser( )
+
+returns a middleware `function(req, res, next)` that will extract the http query
+string parameters and place them in `req.params`
+
+### Restiq.authorizationParser( )
+
+returns a middleware `function(req, res, next)` that will decode an
+`Authorization: Basic` header and set the fields `req.authorization.username`,
+`req.authorization.basic.username` and `req.authorization.basic.password`.
+
+### Restiq.bodyParser( )
+
+returns a middleware `function(req, res, next)` that will decode the request
+body into an object, string or Buffer.  The decoding is ad-hoc based on the
+incoming data type, and is not driven by the request headers.
+
+### Restiq.acceptParser( )
+
+TODO: not implemented yet, but there is a `req.accepts()` method that works
+with the restify acceptParser.
 
 ### req.getId( )
 
@@ -430,3 +452,5 @@ Todo
 - decorate req with .restiq (and restiq with .route)
 - add get/set/peek methods on .restiq, for retrieving app state
 - revisit send(), support headers
+- make addStep() support array of GET, POST etc methods
+- refactor qroute to more efficiently support many different http verbs
