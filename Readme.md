@@ -302,13 +302,15 @@ This is what I have so far --
 
 ### app.pre( func )
 
-add shared middleware step to be called before every request.  Pre steps
-are called in the order added.
+add shared middleware step to be called before every request, before the
+request is routed.  Pre steps are called in the order added.
 
 ### app.use( func )
 
 add shared middleware step to be called before every request after the `pre()`
-steps have all finished.
+steps have all finished.  Each routed call will run only those use steps that
+existed at the time it was added; use steps added after a route is added will
+not be run by that route.  Use steps are run in the order added.
 
 ### app.get( path, handler, [handler2, ...] )
 
@@ -412,7 +414,6 @@ Todo
 - would be handy to have decodeReqBody for decoding JSON and BSON request bodies
 - would be handy to have encodeResBody for encoding JSON and BSON response bodies
 - describe the built-in restify compatibily adapter
-- urldecode path params too (to allow embedded /)
 - make restiq apps emit the underlying http server events
 - make RestifyqRest only relay events if listened for (to maintain correct semantics)
 - write requireParams(opts) that returns a middleware function that looks for
@@ -435,7 +436,7 @@ Todo
 - (Q: how to pass app state in to steps? attach app to req? or ...cleaner?)
 - ? accept routeName handlers, to hand off to another call (... conditionally??)
 - compat: look for Accept-Version: header (and InvalidVersion error)
-- res.send() should use registered formatters (default is the first one listed)
+- res.send() should use registered formatters (default is built-in auto-detect)
 - separate output formatting from Content-Type: allow for a post-formatting step
   to subsequently change the content type.  Look for _isFormatted = true.
   This also allows for pluggable mw formatters, for per-call formats (eg, json
@@ -443,12 +444,10 @@ Todo
 - compat: re-emit all events from http.Server
 - compat: emit restify error events, see http://mcavage.me/node-restify/ #Server+Api
 - compat: expose address(), listen(), close()
-  => alias before() and after() ? or setup() and teardown() ?
 - compat: make parsed query params available in req.query
 - ? make readBody support a max body size limit ?
 - ? offer mw step builders, to accept params?  eg mw.buildReadBody({maxBodySize: 1000}) vs mw.readBody;
-- speed: time w/ bunyan vs w/ qlogger
-- decorate req with .restiq (and restiq with .route)
+- speed: time w/ bunyan vs w/ qlogger (close, 1820 vs 1750 4% restiq, 1177 vs 1066 8% restify)
 - add get/set/peek methods on .restiq, for retrieving app state
 - revisit send(), support headers
 - make addStep() support array of GET, POST etc methods
