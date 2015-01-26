@@ -122,7 +122,7 @@ Canonical server using http:
 With restiq:
 
         var Restiq = require('restiq');
-        var app = Restiq.createServer();
+        var app = Restiq.createServer({readImmediate: 0});
         app.addStep(Restiq.mw.parseQueryParams);
         app.addRoute('GET', '/echo', [
             function(req, res, next) {
@@ -132,7 +132,7 @@ With restiq:
             }
         ]);
         app.listen(1337);
-        // 21.5k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 21.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 With restify:
 
