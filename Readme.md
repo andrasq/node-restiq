@@ -280,8 +280,7 @@ precedence.
 ### Restiq.mw.parseBodyParams( req, res, next )
 
 merge the query string parameters from the body into req.params.  Will read
-the body with mw.readBody if it has not been read already.  Does not parse
-JSON or BSON bodies, just HTTP query strings.
+the body with mw.readBody if it has not been read already.
 
 ### Restiq.mw.readBody( req, res, next )
 
@@ -454,3 +453,5 @@ Todo
 - revisit send(), support headers
 - make addStep() support array of GET, POST etc methods
 - refactor qroute to more efficiently support many different http verbs
+- save the response err to be available in finally steps
+- ? save the response body to be available in finally steps
