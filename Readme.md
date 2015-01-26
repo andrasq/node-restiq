@@ -178,9 +178,13 @@ The options:
 - `readBinary` - when reading the request body, gather the chunks into
    a Buffer instead of a utf8 string.  Gathering to string is faster,
    but Buffers are more traditional for binary data.
-- `readTimeout` - when reading the request body, loop with setTimeout.
-   Define as falsy (0, false or null) to use setImmediate.  If this is
-   not specified, setTimeout is also the default.
+- `readImmediate` - when reading the request body, the loop can iterate with
+   different strategies.  If set to 0 (the default), it uses setTimeout which
+   supports the highest throughput under load.  Set to 1 for setImmediate and
+   the highest throughput with just a few active connections.  Set to 2 for
+   on('data'), which is inbetween the two -- not as fast as the others, but
+   not as slow either.  As a rule of thumb, at 8 active connections or above
+   0 (setTimeout) will offer the highest throughput.
 
         var Restiq = require('restiq');
         var app = Restiq.createServer(options);
