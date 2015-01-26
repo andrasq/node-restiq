@@ -347,8 +347,10 @@ incoming data type, and is not driven by the request headers.
 
 ### Restiq.acceptParser( )
 
-TODO: not implemented yet, but there is a `req.accepts()` method that works
-with the restify acceptParser.
+sets the response content-encoding to the preferred (first) acceptable
+response type specified in the request that is supported by the server.
+Restiq assumes the acceptable encodings are listed in order of preference.
+Throws a 406 Not Acceptable error if no match is found.
 
 ### req.getId( )
 
@@ -454,3 +456,4 @@ Todo
 - refactor qroute to more efficiently support many different http verbs
 - save the response err to be available in finally steps
 - ? save the response body to be available in finally steps
+- alias the more common restify errors

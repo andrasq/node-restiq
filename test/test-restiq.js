@@ -64,9 +64,15 @@ module.exports = {
             var e = new Restiq.errors[405]("msg");
             t.ok(e.code);
             t.ok(e.message);
-            // TODO: this fails:
-            // t.equal(e.message, 'msg');
+            t.equal(e.message, 'msg');
+            t.ok(e instanceof Error);
             t.ok(e.stack);
+            t.done();
+        },
+
+        'error should have default message': function(t) {
+            var e = new Restiq.errors[404]();
+            t.equal(e.message, "Not Found");
             t.done();
         },
 
