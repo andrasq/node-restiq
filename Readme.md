@@ -328,9 +328,10 @@ add a POST route, with handlers to run in the order listed
 
 add a PUT route, with handlers to run in the order listed
 
-### app.del( path, handler, [handler2, ...] )
+### app.delete( path, handler, [handler2, ...] )
 
-add a DELETE route, with handlers to run in the order listed
+add a DELETE route, with handlers to run in the order listed.
+This call is also available as `app.del`.
 
 ### Restiq.queryParser( )
 
@@ -461,3 +462,8 @@ Todo
 - save the response err to be available in finally steps
 - ? save the response body to be available in finally steps
 - alias the more common restify errors
+- support express app.locals and res.locals 
+- add disable/enable/disabled methods on .restiq, for app state (express compat)
+- make app.* calls chainable (eg app.addRoute(), etc)
+- make case-insensitive routing an option
+- populate req.query et al
