@@ -1,0 +1,42 @@
+0.4.1
+- 20k/s
+- default to readImmediate:0
+- restify compat default to readImmediate:2, readBinary:true
+
+0.4.0
+- acceptParser() restify helper
+- fix error classes
+- urldecode route params
+
+0.3.0
+- deprecate after() and finally()
+- tune read loop
+
+0.2.1
+- 21.5k/s
+- bugfix: write per-instance req.params not global
+- speedup: cache route mw stack
+- bodyParser(), authParser() restify helpers
+- fix encoders, decoders
+- bugfix: accepts()
+- bugfix: _bodyEof hang at end of call
+- bugfix: restify compat error handling
+- setNoDelay option
+- speedups
+- expose createServer
+- mw.closeResponse()
+- add 'setup' chain
+- fix #search query string parsing
+- fix 'finally' steps
+
+0.1.0
+- improve restify compat (response handling)
+- speedup: faster run stack
+- fix body param decoding
+- fix route matching edge case
+- improve error handling
+- use() stack
+
+0.0.1
+- 17k/s
+- basics working
