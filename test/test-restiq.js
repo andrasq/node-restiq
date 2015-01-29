@@ -213,9 +213,9 @@ module.exports = {
         },
 
         'should run steps in order': function(t) {
-            var req = qmock.getMock({}, []);
-            var res = qmock.getMock({}, []);
             // TODO: make createServer mockable
+            //var req = qmock.getMock({}, []);
+            //var res = qmock.getMock({}, ['end', 'writeHead', 'setHeader', 'getHeader']);
             //var run, app = Restiq.createServer({createServer: function(onConnect){ run = onConnect; }});
             var app = this.app;
             var order = [];
@@ -228,9 +228,9 @@ module.exports = {
             app.addStep(function(req, res, next){ order.push('after2'); next(); }, 'after');
             app.addStep(function(req, res, next){ order.push('use2'); next(); }, 'use');
             app.addStep(function(req, res, next){ order.push('setup2'); next(); }, 'setup');
-            // run(req, req, function(){ ... });
             app.addRoute('GET', '/echo', [ function(q,s,n){ order.push('app1'); n() }, function(q,s,n){ order.push('app2'); n() } ]);
             app.listen(21337, function(err) {
+            //run(req, res, function(err) {
                 t.ifError(err);
                 HttpClient.get('http://127.0.0.1:21337/echo', function(res) {
                     t.deepEqual(order, ['setup1', 'setup2',
@@ -239,6 +239,7 @@ module.exports = {
                     app.close();
                     t.done();
                 });
+            //});
             });
         },
     },

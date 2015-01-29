@@ -467,3 +467,4 @@ Todo
 - make app.* calls chainable (eg app.addRoute(), etc)
 - make case-insensitive routing an option
 - populate req.query et al
+- removeRoute() to un-add a route
