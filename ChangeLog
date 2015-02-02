@@ -1,3 +1,8 @@
+0.4.2
+- switch to querystring.encode() for now for compatible flat array encodings
+- bump to arlib 0.2.4 to pick up http_parse_query fixes
+- revert slower array-of-chunks readBinary, toString("binary") converts into utf8 as if latin1
+
 0.4.1
 - 20k/s
 - default to readImmediate:0

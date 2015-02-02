@@ -13,7 +13,7 @@ responses.  Unmapped routes return 405 errors.  The calls themselves can
 return any HTTP status code.
 
 There are not a lot of frills yet, but I was able to swap out restify in a
-fairly complex app and have all its unit tests pass.  The app runs 25-30% more
+fairly complex app and have all its unit tests pass.  The app runs 40-50% more
 calls per second on restiq than before.
 
 
