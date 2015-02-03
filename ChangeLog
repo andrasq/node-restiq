@@ -1,3 +1,8 @@
+0.4.3
+- bugfix: decodeBody should not change req.body if cannot decode
+- compat: make decodeQueryParams populate req.query as well as req.params
+- bugfix: propagate errors from parseBody()
+
 0.4.2
 - switch to querystring.encode() for now for compatible flat array encodings
 - bump to arlib 0.2.4 to pick up http_parse_query fixes
