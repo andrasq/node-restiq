@@ -1,3 +1,8 @@
+0.5.0
+- app.removeRoute method
+- [options] param to addRoute (for later)
+- refactor app routers into a struct
+
 0.4.3
 - bugfix: decodeBody should not change req.body if cannot decode
 - compat: make decodeQueryParams populate req.query as well as req.params

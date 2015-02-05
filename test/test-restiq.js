@@ -154,8 +154,8 @@ module.exports = {
             });
         },
 
-        'should have expected mw add methods': function(t) {
-            var i, expect = ['addStep', 'addRoute', 'mapRoute', 'pre', 'use', 'get', 'put', 'post', 'del'];
+        'should have the expected mw and route methods': function(t) {
+            var i, expect = ['addStep', 'addRoute', 'removeRoute', 'mapRoute', 'pre', 'use', 'get', 'put', 'post', 'del'];
             for (i in expect) {
                 t.ok(typeof this.app[expect[i]] === 'function');
             }
@@ -163,7 +163,7 @@ module.exports = {
         },
 
         'should add and map route': function(t) {
-            var i, methods = ['GET', 'PUT', 'POST', 'DEL'];
+            var i, methods = ['GET', 'PUT', 'POST', 'DELETE', 'HEAD', 'custom'];
             var j, routes = ['/echo', '/:x/echo'];
             for (i in methods) for (j in routes) {
                 this.app.addRoute(methods[i], routes[j], [ function(req, res, next){ next() } ]);
@@ -173,6 +173,12 @@ module.exports = {
                 t.ok(route);
                 t.equal(route.name, routes[j]);
             }
+            t.done();
+        },
+
+        'should add route with options': function(t) {
+            var route = this.app.addRoute('GET', '/echo', {opt1: 1, opt2: 2}, ['mw-stack']);
+            t.equal(route.handlers[0], 'mw-stack');
             t.done();
         },
 

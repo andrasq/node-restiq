@@ -225,12 +225,13 @@ call processing proper.  The after steps are for shared post-call wrapup, for
 successful calls.  The finally steps are run as the call teardown, and can do
 the logging, analytics reporting, etc.
 
-### app.addRoute( method, path, handlers )
+### app.addRoute( method, path, [options], handlers )
 
-register a path along with a function (or array of functions) to handle
-requests for it.  Requesting a path that has not been registered or calling a
-path with a different GET, POST, etc request method than it was registered
-with results in a 405 error.
+register a path along with a middleware step function (or array of functions)
+to handle requests for it.  Returns a route object that can be used to remove
+and re-add the route.  Requesting a path that has not been registered or
+calling a path with a different GET, POST, etc request method than it was
+registered with results in a 405 error.
 
 Paths can embed named parameters, denoted with `/:paramName`.  Named
 parameters are extracted and stored into req.params (see also
@@ -241,6 +242,15 @@ existed when the route was mapped.  In the sequence `use`, `use`, `map(1)`,
 `use`, `map(2)`, calls that request route 1 will run only the first two `use`
 steps, but calls that request route 2 will run all three.  All calls will run
 all `finally` steps (if any).
+
+Options:
+
+- TBD; none right now.
+
+### app.removeRoute( route )
+
+remove a previously added route.  The removed route can be re-added later with
+`addRoute(route)`.
 
 ### app.mapRoute( method, path )
 
