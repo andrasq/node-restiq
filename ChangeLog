@@ -1,3 +1,6 @@
+0.5.1
+- speedup: improve readBody readBinary codepath, redo timings
+
 0.5.0
 - app.removeRoute method
 - [options] param to addRoute (for later)

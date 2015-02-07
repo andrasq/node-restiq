@@ -35,16 +35,17 @@ Comparison
 
 A small echo server, parses and returns the url query parameters:
 
-- [restiq](https://www.npmjs.org/package/restiq) - 21.5k/s
+- [restiq](https://www.npmjs.org/package/restiq) - 20.9k/s
 - [http](https://nodejs.org/api/http.html) - 17.6k/s
-- [restify](https://www.npmjs.org/package/restify) - 4.6k/s, 8k/s used as if were http
-- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* or 1.8k/s with `setNoDelay()`
+- [express](https://www.npmjs.org/package/express) - 7.9k/s
+- [restify](https://www.npmjs.org/package/restify) - 4.6k/s (8k/s using just the http methods)
+- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* (1.8k/s with `setNoDelay()`)
   (loop over the hapi sockets hashed in `reply.request.connection._connections`)
 
 \* - there is a res.write() issue with http.ServerResponse.  Calls writing or
      piping the response run at precisely 25 requests/second per connection.
-     It is very easily reproducible; the fix is to add a
-     `res.socket.setNoDelay()` into the response handler.
+     It is very easily reproducible; the fix is to turn off the Nagle algorithm
+     on the response socket with `res.socket.setNoDelay()`.
 
 <!--
         // example of http res.write() bottleneck
@@ -132,7 +133,7 @@ With restiq:
             }
         ]);
         app.listen(1337);
-        // 21.0k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 20.9k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 With restify:
 
@@ -151,7 +152,7 @@ Change just the first two lines to run it under restiq:
         var restify = require('restiq');
         var app = restify.createServer({restify: true});
         // ...
-        // 16.1k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        // 16.2k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 
 Methods
@@ -393,9 +394,8 @@ read back a set header value
 
 send a response.  The default status code is 200, the default response the
 empty string.  The call determines the content type from the response value,
-and emits an appropriate header as well.  NOTE:  restify penalizes sending a
-response without first explicitly setting the Content-Type header.  Time it
-yourself.
+and emits an appropriate header as well.  NOTE:  restify strongly penalizes a
+response that does not set the Content-Type header.  Time it yourself.
 
 Turns out restify responses are also extensions of `http.ServerResponse`, so
 all the usual write(), writeHead(), end() work as well.
@@ -433,23 +433,21 @@ Todo
 - describe the built-in restify compatibily adapter
 - make restiq apps emit the underlying http server events
 - make RestifyqRest only relay events if listened for (to maintain correct semantics)
-- write requireParams(opts) that returns a middleware function that looks for
+- write buildRequireParams(opts) that returns a middleware function that looks for
   required/optional/unknown params
 - double-check the restify compatibility calls, only pass the arguments
   that exist!  else code that uses arguments.length will break
 - make request processing time out to close the connection (w/o response) after ? 60 sec ?
 - call versioning?
 - add app.set(), app.get(), app.delete() methods for key/value properties
-- app.use() has a two-argument form?  (path, handler) ?
+- app.use() has a two-argument form?  (path, handler) ? (...express?)
 - missing app.head() method
 - key off of "Accept: text/plain" etc headers for encoding format to use
 - ? allow routing regexp routes ?
 - handle both base64 and json-array Buffer (binary) data
-- build the std errors with Function(), to create actual named constructor functions
 - should support gzipped responses, 'Accept-Encoding: gzip' (chunked only!)
 - expose reg.log to mw functions
 - split rlib into misc and mw
-- move restify compat code out of restiq into separate file
 - (Q: how to pass app state in to steps? attach app to req? or ...cleaner?)
 - ? accept routeName handlers, to hand off to another call (... conditionally??)
 - compat: look for Accept-Version: header (and InvalidVersion error)
@@ -465,10 +463,8 @@ Todo
 - ? make readBody support a max body size limit ?
 - ? offer mw step builders, to accept params?  eg mw.buildReadBody({maxBodySize: 1000}) vs mw.readBody;
 - speed: time w/ bunyan vs w/ qlogger (close, 1820 vs 1750 4% restiq, 1177 vs 1066 8% restify)
-- add get/set/peek methods on .restiq, for retrieving app state
 - revisit send(), support headers
 - make addStep() support array of GET, POST etc methods
-- refactor qroute to more efficiently support many different http verbs
 - save the response err to be available in finally steps
 - ? save the response body to be available in finally steps
 - alias the more common restify errors
@@ -477,4 +473,4 @@ Todo
 - make app.* calls chainable (eg app.addRoute(), etc)
 - make case-insensitive routing an option
 - populate req.query et al
-- removeRoute() to un-add a route
+- make readBinary a call-by-call option?  eg readBodyBinary vs readBodyText
