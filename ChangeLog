@@ -1,3 +1,6 @@
+0.5.2
+- split http-client out of test-restiq
+
 0.5.1
 - speedup: improve readBody readBinary codepath, redo timings
 

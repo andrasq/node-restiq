@@ -3,45 +3,7 @@ var url = require('url');
 var Restiq = require('../index');
 var qmock = require('qmock');
 
-//
-// TODO: move HttpClient functionality into restiq
-// TODO: decode the response a bit nicer than a raw IncomingMessge
-//
-var HttpClient = {};
-HttpClient._call = function(uri, method, body, cb) {
-    if (!cb && typeof body === 'function') { cb = body; body = ""; }
-    var options = (typeof uri === 'string' ? url.parse(uri) : uri);
-    options.method = method;
-    options.headers = options.headers || {};
-    // TODO: this content encoding logic should be in Restiq.mw,
-    // to be reusable (and overridable).  Eg. mw.encodeResponse(),
-    // keying off .getHeader('content-type')
-    if (!body || typeof body === 'string') {
-        options.headers['Content-Type'] = 'text/plain';
-        body = body;
-    }
-    else if (Buffer.isBuffer(body)) {
-        options.headers['Content-Type'] = 'application/octet-stream';
-        body = JSON.stringify(body);
-    }
-    else {
-        options.headers['Content-Type'] = 'application/json';
-        body = JSON.stringify(body);
-    }
-    var req = http.request(options, function(res) {
-        // end the connection, allow the server to exit on close().
-        // Unfortunately this leaves the socket in TIME_WAIT state for 60 sec.
-        // The response from a request is an http.IncomingMessage object,
-        // which can be decoded with mw.decodeRequestBody.
-        res.socket.end();
-        cb(res);
-    });
-    req.end(body);
-};
-HttpClient.get = function(uri, body, cb) { this._call(uri, 'GET', body, cb); }
-HttpClient.post = function(uri, body, cb) { this._call(uri, 'POST', body, cb); }
-HttpClient.put = function(uri, body, cb) { this._call(uri, 'PUT', body, cb); }
-HttpClient.del = function(uri, body, cb) { this._call(uri, 'DEL', body, cb); }
+var HttpClient = require('../http-client');
 
 module.exports = {
     'Restiq class': {
@@ -196,20 +158,23 @@ module.exports = {
             var self = this;
             this.app = Restiq.createServer();
             this.app.addStep(Restiq.mw.closeResponse, 'finally');
+            this.httpClient = new HttpClient();
             done();
         },
 
         'should run pre steps': function(t) {
             var app = this.app;
-            t.expect(3);
+            var httpClient = this.httpClient;
+            t.expect(4);
             app.pre(function(req, res, next){
                 t.ok(1);
                 next();
             });
-            app.addRoute('GET', '/echo', []);
+            app.addRoute('GET', '/echo', [function(req, res, next) { res.end("done"); next() }]);
             app.listen(21337, function(err){
                 t.ifError(err);
-                HttpClient.get('http://127.0.0.1:21337/echo', function(res) {
+                httpClient.get('http://127.0.0.1:21337/echo', function(err, res) {
+                    t.ifError(err);
                     t.equal(res.statusCode, 200);
                     app.close(function(){
                         t.done();
@@ -224,8 +189,9 @@ module.exports = {
             //var res = qmock.getMock({}, ['end', 'writeHead', 'setHeader', 'getHeader']);
             //var run, app = Restiq.createServer({createServer: function(onConnect){ run = onConnect; }});
             var app = this.app;
+            var httpClient = this.httpClient;
             var order = [];
-            t.expect(2);
+            t.expect(3);
             app.addStep(function(req, res, next){ order.push('finally1'); next(); }, 'finally');
             app.addStep(function(req, res, next){ order.push('after1'); next(); }, 'after');
             app.addStep(function(req, res, next){ order.push('use1'); next(); }, 'use');
@@ -238,7 +204,8 @@ module.exports = {
             app.listen(21337, function(err) {
             //run(req, res, function(err) {
                 t.ifError(err);
-                HttpClient.get('http://127.0.0.1:21337/echo', function(res) {
+                httpClient.get('http://127.0.0.1:21337/echo', function(err, res) {
+                    t.ifError(err);
                     t.deepEqual(order, ['setup1', 'setup2',
                                         'use1', 'use2', 'app1', 'app2',
                                         'after1', 'after2', 'finally1', 'finally2']);
