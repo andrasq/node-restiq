@@ -32,8 +32,16 @@ module.exports = {
     },
 
     'should return error on transmission error': function(t) {
-        // TODO: fake it?
-        t.done();
+        var req = new EventEmitter();
+        req.end = function(data) { }
+        var res = new EventEmitter();
+        setTimeout(function(){ res.emit('error', new Error("oops")); }, 2);
+        var client = new HttpClient({request: function(options, cb) { cb(res); return req; }});
+        client.call('GET', "http://localhost", function(err, cres) {
+            t.ok(err);
+            t.equal(err.message, "oops");
+            t.done();
+        });
     },
 
     'should assemble response from chunks': function(t) {
@@ -47,11 +55,11 @@ module.exports = {
         var client = new HttpClient({request: function(options, cb) { cb(res); return req; }});
         client.call('GET', "http://localhost", function(err, cres) {
             t.equal(res, cres);
-            // WARNING: node-v0.10.29: timeout functions are not always called in order
-            // eg with timeouts (1,2,3,3) have seen "bac" and "ac" and "ab"
-            // fix: make all calls on the same timeout, and trust that order is preserved
-            t.ok(Buffer.isBuffer(res.body));
+            // WARNING: node-v0.10.29: timeout functions are not always called in timeout order
+            // eg with timeouts (1,2,3,3) have seen "bac" and "ac"; with (1,2,3,4) seen "ab"
+            // However, order seems to be preserved within the same timeout interval.
             t.equal("abc", res.body.toString());
+            t.ok(Buffer.isBuffer(res.body));
             t.done();
         });
     },
