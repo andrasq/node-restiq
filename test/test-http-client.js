@@ -40,13 +40,17 @@ module.exports = {
         var req = new EventEmitter();
         req.end = function(data) { }
         var res = new EventEmitter();
-        setTimeout(function(){ res.emit('data', new Buffer("a")) }, 1);
+        setTimeout(function(){ res.emit('data', new Buffer("a")) }, 2);
         setTimeout(function(){ res.emit('data', new Buffer("b")) }, 2);
-        setTimeout(function(){ res.emit('data', new Buffer("c")) }, 3);
-        setTimeout(function(){ res.emit('end') }, 3);
+        setTimeout(function(){ res.emit('data', new Buffer("c")) }, 2);
+        setTimeout(function(){ res.emit('end') }, 2);
         var client = new HttpClient({request: function(options, cb) { cb(res); return req; }});
         client.call('GET', "http://localhost", function(err, cres) {
             t.equal(res, cres);
+            // WARNING: node-v0.10.29: timeout functions are not always called in order
+            // eg with timeouts (1,2,3,3) have seen "bac" and "ac" and "ab"
+            // fix: make all calls on the same timeout, and trust that order is preserved
+            t.ok(Buffer.isBuffer(res.body));
             t.equal("abc", res.body.toString());
             t.done();
         });
