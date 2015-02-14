@@ -417,11 +417,11 @@ Random observations on building fast REST services
   for static paths is a single hash lookup, vs a for loop over a list of
   regexp objects).  Even though path params are faster to extract with a regexp
   than parsing the query string, it does not make up for the routing latency.
-- this may be obvious, but passing just REST or just GET params is faster than
+- this may be obvious, but passing just path or just query params is faster than
   passing both
 - using `res.write()` to reply imposes a throttle of 25 requests per
   connection.  Workaround is to set `res.socket.setNoDelay()` to disable the
-  TCP/IP Nagle write combining.  Only disable for local traffic.
+  TCP/IP Nagle algorithm.  Only disable for local traffic, never across the internet.
 
 Todo
 ----

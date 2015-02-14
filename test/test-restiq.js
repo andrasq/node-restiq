@@ -173,7 +173,7 @@ module.exports = {
             app.addRoute('GET', '/echo', [function(req, res, next) { res.end("done"); next() }]);
             app.listen(21337, function(err){
                 t.ifError(err);
-                httpClient.get('http://127.0.0.1:21337/echo', function(err, res) {
+                httpClient.call('GET', 'http://127.0.0.1:21337/echo', function(err, res) {
                     t.ifError(err);
                     t.equal(res.statusCode, 200);
                     app.close(function(){
@@ -204,7 +204,7 @@ module.exports = {
             app.listen(21337, function(err) {
             //run(req, res, function(err) {
                 t.ifError(err);
-                httpClient.get('http://127.0.0.1:21337/echo', function(err, res) {
+                httpClient.call('GET', 'http://127.0.0.1:21337/echo', function(err, res) {
                     t.ifError(err);
                     t.deepEqual(order, ['setup1', 'setup2',
                                         'use1', 'use2', 'app1', 'app2',
