@@ -101,5 +101,19 @@ module.exports = {
                 t.done();
             });
         },
+
+        'should accept uri object': function(t) {
+            t.expect(2);
+            var uri = {
+                url: "/",
+                hostname: "localhost",
+                port: 80,
+            };
+            this.client.get(uri, function(err, req, res, obj) {
+                t.ifError(err);
+                t.ok(res.body.length);
+                t.done();
+            });
+        },
     },
 };
