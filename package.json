@@ -1,6 +1,6 @@
 {
   "name": "restiq",
-  "version": "0.5.3-pre",
+  "version": "0.5.3",
   "description": "smaller, faster, lighter-weight REST micro-framework",
   "license": "Apache-2.0",
   "main": "index.js",
@@ -28,7 +28,7 @@
     "express"
   ],
   "dependencies": {
-    "arlib": "0.2.4",
+    "qhttp": "0.0.2",
     "aflow": "0.2.3"
   },
   "devDependencies": {

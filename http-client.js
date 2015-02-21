@@ -1,1 +1,1 @@
-module.exports = require('./lib/http-client.js');
+module.exports = require('qhttp/http-client');
