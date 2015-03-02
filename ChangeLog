@@ -1,3 +1,7 @@
+0.5.4-pre
+- bump to aflow 0.9.0 (unit tests)
+- bump to qhttp 0.0.4 (track latest)
+
 0.5.3
 - move http-client into the qhttp package
 - change arlib dependency to qhttp

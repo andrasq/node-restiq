@@ -63,7 +63,7 @@ A small echo server, parses and returns the url query parameters:
 Overview
 --------
 
-An web service responds to requests sent to pathname-like addresses
+A web service responds to requests sent to pathname-like addresses
 ("routes").  The server extracts the request parameters, looks up the
 computation associated with the route, runs it, and returns the generated
 response.
@@ -72,7 +72,7 @@ Parameters can be embedded in the request path itself (path parameters),
 appended to the path in HTTP query string format (a `?` followed by
 '&'-separated name=value pairs, eg `?a=1&b=2`), or be in the request body in
 HTTP query string format or some other serialization format eg JSON or BSON.
-Restic knows about path params and on-path and in-body HTTP query params.
+Restiq knows about path params and on-path and in-body HTTP query params.
 
 The computation is composed of a series of steps (the "middleware stack"),
 each step a function taking the request, the response thus far, and a callback

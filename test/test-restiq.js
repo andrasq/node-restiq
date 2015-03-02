@@ -98,6 +98,7 @@ module.exports = {
             var ok = this.app.listen(21337, function(err) {
                 t.ifError(err);
                 app.close(function() {
+// FIXME: app is not closed with qunit, next test starts before callback is called
                     t.ok(1);
                     t.done();
                 });
