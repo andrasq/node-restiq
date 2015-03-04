@@ -29,4 +29,18 @@ module.exports = {
         for (var i in methods) t.ok(Restiq[methods[i]]);
         t.done();
     },
+
+    'should have restify-compat mw and route methods': function(t) {
+        var i, expect = ['pre', 'use', 'get', 'put', 'post', 'del'];
+        for (i in expect) {
+            t.ok(typeof this.app[expect[i]] === 'function');
+        }
+        t.done();
+    },
+
+    'should have restify-compat methods': function(t) {
+        t.equal(typeof Restiq.bodyParser, 'function');
+        t.equal(typeof Restiq.queryParser, 'function');
+        t.done();
+    },
 };

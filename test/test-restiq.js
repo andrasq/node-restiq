@@ -38,12 +38,6 @@ module.exports = {
             t.done();
         },
 
-        'should have restify-compat methods': function(t) {
-            t.equal(typeof Restiq.bodyParser, 'function');
-            t.equal(typeof Restiq.queryParser, 'function');
-            t.done();
-        },
-
         'should create app': function(t) {
             var app = Restiq.createServer();
             t.ok(app instanceof Restiq);
@@ -118,7 +112,7 @@ module.exports = {
         },
 
         'should have the expected mw and route methods': function(t) {
-            var i, expect = ['addStep', 'addRoute', 'removeRoute', 'mapRoute', 'pre', 'use', 'get', 'put', 'post', 'del'];
+            var i, expect = ['addStep', 'addRoute', 'removeRoute', 'mapRoute'];
             for (i in expect) {
                 t.ok(typeof this.app[expect[i]] === 'function');
             }
@@ -167,10 +161,7 @@ module.exports = {
             var app = this.app;
             var httpClient = this.httpClient;
             t.expect(4);
-            app.pre(function(req, res, next){
-                t.ok(1);
-                next();
-            });
+            app.addStep(function(req, res, next){ t.ok(1); next(); }, 'setup');
             app.addRoute('GET', '/echo', [function(req, res, next) { res.end("done"); next() }]);
             app.listen(21337, function(err){
                 t.ifError(err);
