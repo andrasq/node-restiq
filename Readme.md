@@ -16,6 +16,13 @@ There are not a lot of frills yet, but I was able to swap out restify in a
 fairly complex app and have all its unit tests pass.  The app runs 40-50% more
 calls per second on restiq than before.
 
+        var Restiq = require('restiq');
+        var app = Restiq.createServer();
+
+        app.addRoute('GET', '/', function(req, res, next) {
+            res.end('Hello, world.');
+            next();
+        });
 
 Objectives
 ----------

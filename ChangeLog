@@ -1,6 +1,8 @@
-0.5.4-pre
-- bump to aflow 0.9.0 (unit tests)
-- bump to qhttp 0.0.4 (track latest)
+0.6.0-pre
+- bump to aflow 0.9.3 (unit tests, track latest)
+- bump to qhttp 0.0.6 (track latest)
+- fix Restiq.listen() callback to only call once started
+- remove qhttp sources
 
 0.5.3
 - move http-client into the qhttp package
