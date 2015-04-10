@@ -1,4 +1,4 @@
-0.6.0-pre
+0.6.0
 - bump to aflow 0.9.3 (unit tests, track latest)
 - bump to qhttp 0.0.6 (track latest)
 - fix Restiq.listen() callback to only call once started
