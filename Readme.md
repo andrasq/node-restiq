@@ -23,6 +23,7 @@ calls per second on restiq than before.
             res.end('Hello, world.');
             next();
         });
+        app.listen(1337);
 
 Objectives
 ----------
@@ -165,9 +166,14 @@ Change just the first two lines to run it under restiq:
 Methods
 -------
 
-### createServer( options )
+### Restiq( options )
+### Restiq.createServer( options )
 
-create a new app.
+create a new app.  the `createServer` methods returns a newly created app with
+no routes and no middleware steps that is not yet listening for connections.
+`Restiq()` as a function is not a constructor but a builder, it creates a new
+app just like createServer does.  (being a builder is similar to `express`,
+createServer is similar to `http` and `restify`)
 
 The options:
 
@@ -194,8 +200,8 @@ The options:
    not as slow either.  As a rule of thumb, at 8 active connections or above
    0 (setTimeout) will offer the highest throughput.
 
-        var Restiq = require('restiq');
-        var app = Restiq.createServer(options);
+        var restiq = require('restiq');
+        var app = restiq.createServer(options);
 
 ### app.listen( port, [hostname], [backlog], [confirmationCallback] )
 

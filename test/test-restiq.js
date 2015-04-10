@@ -43,6 +43,23 @@ module.exports = {
             t.ok(app instanceof Restiq);
             t.done();
         },
+
+        'should create app by function': function(t) {
+            var app = Restiq();
+            t.ok(app instanceof Restiq);
+            t.ok(! app.hasOwnProperty('listen'));
+            t.done();
+        },
+
+        'should not create app by new': function(t) {
+            var app = new Restiq();
+            t.expect(3);
+            t.ok(app instanceof Restiq);
+            t.ok(app.hasOwnProperty('listen'));
+            try { app.listen(); t.ok(false); }
+            catch (err) { t.ok(true); }
+            t.done();
+        },
     },
 
     'restiq mw': {

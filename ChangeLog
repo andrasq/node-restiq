@@ -3,6 +3,7 @@
 - bump to qhttp 0.0.6 (track latest)
 - fix Restiq.listen() callback to only call once started
 - remove qhttp sources
+- make Restiq() build apps like express() does
 
 0.5.3
 - move http-client into the qhttp package
