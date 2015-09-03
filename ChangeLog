@@ -1,3 +1,8 @@
+0.6.1
+- add req.path() compat method
+- tolerate double-close
+- read request as 'utf8' to not split multi-byte chars
+
 0.6.0
 - bump to aflow 0.9.3 (unit tests, track latest)
 - bump to qhttp 0.0.6 (track latest)

@@ -395,6 +395,10 @@ returns the options.version string that was passed to createServer()
 return the named header field, or defaultValue if that header field was not
 specified in the request
 
+### req.path( )
+
+returns req.url
+
 ### res.header( name, value )
 
 set a header value, aka writeHeader
@@ -451,7 +455,6 @@ Todo
 - double-check the restify compatibility calls, only pass the arguments
   that exist!  else code that uses arguments.length will break
 - make request processing time out to close the connection (w/o response) after ? 60 sec ?
-- call versioning?
 - add app.set(), app.get(), app.delete() methods for key/value properties
 - app.use() has a two-argument form?  (path, handler) ? (...express?)
 - missing app.head() method
@@ -484,6 +487,9 @@ Todo
 - support express app.locals and res.locals 
 - add disable/enable/disabled methods on .restiq, for app state (express compat)
 - make app.* calls chainable (eg app.addRoute(), etc)
-- make case-insensitive routing an option
+- make case-insensitive routing an option (downcase path)
 - populate req.query et al
 - make readBinary a call-by-call option?  eg readBodyBinary vs readBodyText
+- make routing a mw step, to help w/ path rewriting (to route, edit, re-route)
+- support limit on max request size? (error out if too big)
+- call versioning
