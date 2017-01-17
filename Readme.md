@@ -1,7 +1,7 @@
 restiq
 ======
 
-smaller, lighter, faster framework for REST API's, in the spirit of restify.
+Smaller, lighter, faster framework for REST API's, in the spirit of [restify].
 
 Lean and fast for low-latency micro-services where overhead is important.
 Depending on the app, can serve 20k requests / second or more, and 18k / sec
@@ -16,14 +16,15 @@ There are not a lot of frills yet, but I was able to swap out restify in a
 fairly complex app and have all its unit tests pass.  The app runs 40-50% more
 calls per second on restiq than before.
 
-        var Restiq = require('restiq');
-        var app = Restiq.createServer();
+    var restiq = require('restiq');
+    var app = restiq.createServer();
 
-        app.addRoute('GET', '/', function(req, res, next) {
-            res.end('Hello, world.');
-            next();
-        });
-        app.listen(1337);
+    app.addRoute('GET', '/', function(req, res, next) {
+        res.end('Hello, world.');
+        next();
+    });
+    app.listen(1337);
+
 
 Objectives
 ----------
@@ -43,11 +44,11 @@ Comparison
 
 A small echo server, parses and returns the url query parameters:
 
-- [restiq](https://www.npmjs.org/package/restiq) - 20.9k/s
-- [http](https://nodejs.org/api/http.html) - 17.6k/s
-- [express](https://www.npmjs.org/package/express) - 7.9k/s
-- [restify](https://www.npmjs.org/package/restify) - 4.6k/s (8k/s using just the http methods)
-- [hapi](https://www.npmjs.org/package/hapi) - 0.2k/s* (1.8k/s with `setNoDelay()`)
+- restiq - 20.9k/s
+- [http] - 17.6k/s
+- [express] - 7.9k/s
+- [restify] - 4.6k/s (8k/s using just the http methods)
+- [hapi] - 0.2k/s* (1.8k/s with `setNoDelay()`)
   (loop over the hapi sockets hashed in `reply.request.connection._connections`)
 
 \* - there is a res.write() issue with http.ServerResponse.  Calls writing or
@@ -55,18 +56,6 @@ A small echo server, parses and returns the url query parameters:
      It is very easily reproducible; the fix is to turn off the Nagle algorithm
      on the response socket with `res.socket.setNoDelay()`.
 
-<!--
-        // example of http res.write() bottleneck
-        var server = http.createServer( function(req, res) {
-            res.socket.setNoDelay();    // compare with and without setNoDelay
-            req.on('data', function(){});
-            req.on('end', function(){
-                res.write('Hello, world!\n');
-                res.end();
-            });
-        });
-        server.listen(1337);
--->
 
 Overview
 --------
@@ -92,88 +81,84 @@ or in common to all routes.  Steps in common can be either before or after the
 per-route steps.  In addition, steps can be configured to run after all other
 processing is complete even in case of errors.
 
-The Restiq request and responses are just node
-[`http.incomingMessage`](https://www.nodejs.org/api/http.html#http_http_incomingmessage)
-and
-[`http.ServerResponse`](https://www.nodejs.org/api/http.html#http_class_http_serverresponse)
-objects.
+The restiq request and responses are just node [http.IncomingMessage] and
+[http.ServerResponse] objects.
 
 Restiq includes a thin compatibility layer for shimming simple
-[`restify`](https://www.npmjs.org/package/restify)
-applications onto Restiq.
+[restify] applications onto restiq.
 
 
 Examples
 --------
 
 Surprisingly, it is possible to build on top of http and achieve better
-throughput than a canonical http server as shown below.  Because regexes are
+throughput than a canonical http server as shown below.  Because RegExps are
 very fast in node, extracting path params is only 5% slower.  (Timed with
 node-v0.10.29 on an AMD 3.6 GHz 4x Phenom II.)
 
-Canonical server using http:
+Canonical server using [http]:
 
-        var http = require('http');
-        var querystring = require('querystring');
-        var server = http.createServer(function(req, res) {
-            req.data = "";
-            req.on('data', function(chunk) { req.data += chunk; });
-            req.on('end', function() {
-                var url = req.url, qs = url.indexOf('?');
-                if (qs >= 0) req.params = querystring.parse(url.slice(qs+1));
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify(req.params));
-            });
+    var http = require('http');
+    var querystring = require('querystring');
+    var server = http.createServer(function(req, res) {
+        req.data = "";
+        req.on('data', function(chunk) { req.data += chunk; });
+        req.on('end', function() {
+            var url = req.url, qs = url.indexOf('?');
+            if (qs >= 0) req.params = querystring.parse(url.slice(qs+1));
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(JSON.stringify(req.params));
         });
-        server.listen(1337, '127.0.0.1');
-        // 17.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+    });
+    server.listen(1337, '127.0.0.1');
+    // 17.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 With restiq:
 
-        var Restiq = require('restiq');
-        var app = Restiq.createServer({readImmediate: 0});
-        app.addStep(Restiq.mw.parseQueryParams);
-        app.addRoute('GET', '/echo', [
-            function(req, res, next) {
-                res.writeHeader(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify(req.params));
-                next();
-            }
-        ]);
-        app.listen(1337);
-        // 20.9k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
-
-With restify:
-
-        var restify = require('restify');
-        var app = restify.createServer();
-        app.use(restify.queryParser());
-        app.get('/echo', function(req, res, next) {
-            res.send(200, req.params);
+    var Restiq = require('restiq');
+    var app = Restiq.createServer({readImmediate: 0});
+    app.addStep(Restiq.mw.parseQueryParams);
+    app.addRoute('GET', '/echo', [
+        function(req, res, next) {
+            res.writeHeader(200, {'Content-Type': 'application/json'});
+            res.end(JSON.stringify(req.params));
             next();
-        });
-        app.listen(1337);
-        // 4.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+        }
+    ]);
+    app.listen(1337);
+    // 20.9k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+
+With [restify]:
+
+    var restify = require('restify');
+    var app = restify.createServer();
+    app.use(restify.queryParser());
+    app.get('/echo', function(req, res, next) {
+        res.send(200, req.params);
+        next();
+    });
+    app.listen(1337);
+    // 4.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 Change just the first two lines to run it under restiq:
 
-        var restify = require('restiq');
-        var app = restify.createServer({restify: true});
-        // ...
-        // 16.2k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
+    var restify = require('restiq');
+    var app = restify.createServer({restify: true});
+    // ...
+    // 16.2k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
 
 Methods
 -------
 
-### Restiq( options )
-### Restiq.createServer( options )
+### `restiq( options )`
+### `restiq.createServer( options )`
 
-create a new app.  the `createServer` methods returns a newly created app with
+Create a new app.  The `createServer` method returns a newly created app with
 no routes and no middleware steps that is not yet listening for connections.
-`Restiq()` as a function is not a constructor but a builder, it creates a new
-app just like createServer does.  (being a builder is similar to `express`,
-createServer is similar to `http` and `restify`)
+`restiq()` as a function is not a constructor but a builder, it creates a new
+app just like `createServer` does.  (Being a builder is similar to `express`,
+`createServer` is similar to `http` and `restify`)
 
 The options:
 
@@ -193,25 +178,26 @@ The options:
    a Buffer instead of a utf8 string.  Gathering to string is faster,
    but Buffers are more traditional for binary data.
 - `readImmediate` - when reading the request body, the loop can iterate with
-   different strategies.  If set to 0 (the default), it uses setTimeout which
-   supports the highest throughput under load.  Set to 1 for setImmediate and
+   different strategies.  If set to 0 (the default), it uses `setTimeout` which
+   supports the highest throughput under load.  Set to 1 for `setImmediate` and
    the highest throughput with just a few active connections.  Set to 2 for
-   on('data'), which is inbetween the two -- not as fast as the others, but
+   `on('data')`, which is in between the two -- not as fast as the others, but
    not as slow either.  As a rule of thumb, at 8 active connections or above
-   0 (setTimeout) will offer the highest throughput.
+   0 (`setTimeout`) will offer the highest throughput.
 
         var restiq = require('restiq');
         var app = restiq.createServer(options);
 
-### app.listen( port, [hostname], [backlog], [confirmationCallback] )
 
-start the service.  If given, confirmationCallback will be invoked when
+### `app.listen( port, [hostname], [backlog], [confirmationCallback] )`
+
+Start the service.  If given, `confirmationCallback` will be invoked when
 the service is ready to receive requests.  Hostname and backlog as for
 `http.createServer`.
 
-### app.addStep( func, [where] )
+### `app.addStep( func, [where] )`
 
-add a processing step to the middleware stack.  Each step is a function
+Add a processing step to the middleware stack.  Each step is a function
 `step(req, res, next)` taking request, response and a next-step callback.
 `func` is a step function or an array of step functions. The optional `where`
 specifies in which section of the middleware chain to insert the step; the
@@ -228,27 +214,27 @@ The middleware sections are:
 Middleware steps are run in the above section order, and steps within a
 section are run in the order added.  Shared steps are run by all calls.  Use
 steps are partially shared, and are run by only those routes that were added
-after the use step had already been added.  Ie if use step and routes are
+after the use step had already been added.  I.e. if use step and routes are
 added interleaved, not all routes will run all use steps; all routes will run
 those use steps that are added before the first route is added.  The route
 handler steps are defined per route and added with `addRoute()`.
 
-The setup steps provide an opportunity to edit the route, ie implement route
+The setup steps provide an opportunity to edit the route, i.e. implement route
 aliasing, version mapping, etc.  The use and route steps implement the
 call processing proper.  The after steps are for shared post-call wrapup, for
 successful calls.  The finally steps are run as the call teardown, and can do
 the logging, analytics reporting, etc.
 
-### app.addRoute( method, path, [options], handlers )
+### `app.addRoute( method, path, [options], handlers )`
 
-register a path along with a middleware step function (or array of functions)
+Register a path along with a middleware step function (or array of functions)
 to handle requests for it.  Returns a route object that can be used to remove
 and re-add the route.  Requesting a path that has not been registered or
 calling a path with a different GET, POST, etc request method than it was
 registered with results in a 405 error.
 
 Paths can embed named parameters, denoted with `/:paramName`.  Named
-parameters are extracted and stored into req.params (see also
+parameters are extracted and stored into `req.params` (see also
 `mw.parseRouteParams` below).
 
 For restify compatibility, mapped routes execute those `use` steps that
@@ -261,65 +247,68 @@ Options:
 
 - TBD; none right now.
 
-### app.removeRoute( route )
 
-remove a previously added route.  The removed route can be re-added later with
+### `app.removeRoute( route )`
+
+Remove a previously added route.  The removed route can be re-added later with
 `addRoute(route)`.
 
-### app.mapRoute( method, path )
 
-for internal use, look up the route for the call.
+### `app.mapRoute( method, path )`
+
+For internal use, look up the route for the call.
 
 The mapped route includes the requested `path`, the matching route `name`, the
 `tail` of the query string with the query parameters, any named parameter
 `vars` included, and the list of `handlers` to run for this request.
 
-For example
+For example:
 
-        app.addRoute('GET', '/:color/echo', echoColor)
-        app.mapRoute('GET', '/green/echo?a=1&b=2')
-        // => {
-        //   path: '/green/echo?a=1&b=2',
-        //   name: '/:color/echo',
-        //   tail: '?a=1&b=2',
-        //   vars: {color: "green"},
-        //   handlers: [echoColor]
-        // }
+    app.addRoute('GET', '/:color/echo', echoColor)
+    app.mapRoute('GET', '/green/echo?a=1&b=2')
+    // => {
+    //   path: '/green/echo?a=1&b=2',
+    //   name: '/:color/echo',
+    //   tail: '?a=1&b=2',
+    //   vars: {color: "green"},
+    //   handlers: [echoColor]
+    // }
 
 Note getting the route extracts only the path params; the query string
 params can be gotten with `app.mw.parseQueryParams()`.
 
-Restiq.mw
----------
+
+`restiq.mw`
+-----------
 
 A library of pre-written middleware utility functions.
 
-### Restiq.mw.parseQueryParams( req, res, next )
+### `restiq.mw.parseQueryParams( req, res, next )`
 
-merge the query string parameters into req.params
+Merge the query string parameters into `req.params`.
 
-### Restiq.mw.parseRouteParams( req, res, next )
+### `restiq.mw.parseRouteParams( req, res, next )`
 
-merge the parameters embedded in the request path into req.params.  This is
+Merge the parameters embedded in the request path into `req.params`.  This is
 done automatically as soon as the route is mapped, but explicit param parsing
 can override these values.  Re-merging allows control of the param source
 precedence.
 
-### Restiq.mw.parseBodyParams( req, res, next )
+### `Restiq.mw.parseBodyParams( req, res, next )`
 
-merge the query string parameters from the body into req.params.  Will read
-the body with mw.readBody if it has not been read already.
+Merge the query string parameters from the body into `req.params`.  Will read
+the body with `mw.readBody` if it has not been read already.
 
-### Restiq.mw.readBody( req, res, next )
+### `Restiq.mw.readBody( req, res, next )`
 
-gather up the message that was sent with the http request, and save it in
-req.body.  This call is safe to call more than once, but sets body only the
+Gather up the message that was sent with the http request, and save it in
+`req.body`.  This call is safe to call more than once, but sets body only the
 first time.
 
-### Restiq.mw.skipBody( req, res, next )
+### `Restiq.mw.skipBody( req, res, next )`
 
-if the request body is guaranteed to be empty, it is faster to skip waiting
-for the on('end') event.  Be careful when using this:  if the request has a
+If the request body is guaranteed to be empty, it is faster to skip waiting
+for the `on('end')` event.  Be careful when using this:  if the request has a
 body it needs to be consumed.
 
 
@@ -328,88 +317,105 @@ Restify Compatibility Layer
 
 This is what I have so far --
 
-### app.pre( func )
 
-add shared middleware step to be called before every request, before the
+### `app.pre( func )`
+
+Add shared middleware step to be called before every request, before the
 request is routed.  Pre steps are called in the order added.
 
-### app.use( func )
 
-add shared middleware step to be called before every request after the `pre()`
+### `app.use( func )`
+
+Add shared middleware step to be called before every request after the `pre()`
 steps have all finished.  Each routed call will run only those use steps that
 existed at the time it was added; use steps added after a route is added will
 not be run by that route.  Use steps are run in the order added.
 
-### app.get( path, handler, [handler2, ...] )
 
-add a GET route, with handlers to run in the order listed
+### `app.get( path, handler, [handler2, ...] )`
 
-### app.post( path, handler, [handler2, ...] )
+Add a GET route, with handlers to run in the order listed
 
-add a POST route, with handlers to run in the order listed
 
-### app.put( path, handler, [handler2, ...] )
+### `app.post( path, handler, [handler2, ...] )`
 
-add a PUT route, with handlers to run in the order listed
+Add a POST route, with handlers to run in the order listed
 
-### app.delete( path, handler, [handler2, ...] )
 
-add a DELETE route, with handlers to run in the order listed.
+### `app.put( path, handler, [handler2, ...] )`
+
+Add a PUT route, with handlers to run in the order listed
+
+
+### `app.delete( path, handler, [handler2, ...] )`
+
+Add a DELETE route, with handlers to run in the order listed.
 This call is also available as `app.del`.
 
-### Restiq.queryParser( )
 
-returns a middleware `function(req, res, next)` that will extract the http query
+### `restiq.queryParser( )`
+
+Returns a middleware `function(req, res, next)` that will extract the http query
 string parameters and place them in `req.params`
 
-### Restiq.authorizationParser( )
 
-returns a middleware `function(req, res, next)` that will decode an
+### `restiq.authorizationParser( )`
+
+Returns a middleware `function(req, res, next)` that will decode an
 `Authorization: Basic` header and set the fields `req.authorization.username`,
 `req.authorization.basic.username` and `req.authorization.basic.password`.
 
-### Restiq.bodyParser( )
 
-returns a middleware `function(req, res, next)` that will decode the request
+### `restiq.bodyParser( )`
+
+Returns a middleware `function(req, res, next)` that will decode the request
 body into an object, string or Buffer.  The decoding is ad-hoc based on the
 incoming data type, and is not driven by the request headers.
 
-### Restiq.acceptParser( )
 
-sets the response content-encoding to the preferred (first) acceptable
+### `restiq.acceptParser( )`
+
+Sets the response content-encoding to the preferred (first) acceptable
 response type specified in the request that is supported by the server.
 Restiq assumes the acceptable encodings are listed in order of preference.
 Throws a 406 Not Acceptable error if no match is found.
 
-### req.getId( )
+
+### `req.getId( )`
 
 returns the request id contained in the request headers.  Unlike restify,
 restiq uses a dash `-` if can't find one, and  does not make one up.
 
-### req.version( )
 
-returns the options.version string that was passed to createServer()
+### `req.version( )`
 
-### req.header( name, [defaultValue] )
+Returns the options.version string that was passed to `createServer()`.
 
-return the named header field, or defaultValue if that header field was not
-specified in the request
 
-### req.path( )
+### `req.header( name, [defaultValue] )`
 
-returns req.url
+Return the named header field, or `defaultValue` if that header field was not
+specified in the request.
 
-### res.header( name, value )
 
-set a header value, aka writeHeader
+### `req.path( )`
 
-### res.get( name )
+Returns `req.url`.
 
-read back a set header value
 
-### res.send( [statusCode], [response] )
+### `res.header( name, value )`
 
-send a response.  The default status code is 200, the default response the
+Set a header value, aka `writeHeader`.
+
+
+### `res.get( name )`
+
+Read back a set header value.
+
+
+### `res.send( [statusCode], [response] )`
+
+Send a response.  The default status code is 200, the default response the
 empty string.  The call determines the content type from the response value,
 and emits an appropriate header as well.  NOTE:  restify strongly penalizes a
 response that does not set the Content-Type header.  Time it yourself.
@@ -439,6 +445,7 @@ Random observations on building fast REST services
 - using `res.write()` to reply imposes a throttle of 25 requests per
   connection.  Workaround is to set `res.socket.setNoDelay()` to disable the
   TCP/IP Nagle algorithm.  Only disable for local traffic, never across the internet.
+
 
 Todo
 ----
@@ -493,3 +500,12 @@ Todo
 - make routing a mw step, to help w/ path rewriting (to route, edit, re-route)
 - support limit on max request size? (error out if too big)
 - call versioning
+
+
+[express]: https://expressjs.com/
+[hapi]: https://hapijs.com/
+[restify]: http://restify.com/
+[http]: https://nodejs.org/api/http.html
+[http.IncomingMessage]: https://www.nodejs.org/api/http.html#http_http_incomingmessage
+and
+[http.ServerResponse]: https://www.nodejs.org/api/http.html#http_class_http_serverresponse
