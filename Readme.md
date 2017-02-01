@@ -235,7 +235,7 @@ registered with results in a 405 error.
 
 Paths can embed named parameters, denoted with `/:paramName`.  Named
 parameters are extracted and stored into `req.params` (see also
-`mw.parseRouteParams` below).
+`restiq.mw.parseRouteParams` below).
 
 For restify compatibility, mapped routes execute those `use` steps that
 existed when the route was mapped.  In the sequence `use`, `use`, `map(1)`,
@@ -297,7 +297,7 @@ precedence.
 ### restiq.mw.parseBodyParams( req, res, next )
 
 Merge the query string parameters from the body into `req.params`.  Will read
-the body with `mw.readBody` if it has not been read already.
+the body with `restiq.mw.readBody` if it has not been read already.
 
 ### restiq.mw.readBody( req, res, next )
 
