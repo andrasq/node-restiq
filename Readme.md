@@ -14,7 +14,7 @@ return any HTTP status code.
 
 There are not a lot of frills yet, but I was able to swap out restify in a
 fairly complex app and have all its unit tests pass.  The app runs 40-50% more
-calls per second on restiq than before.
+calls per second on [restiq] than before.
 
     var restiq = require('restiq');
     var app = restiq.createServer();
@@ -44,7 +44,7 @@ Comparison
 
 A small echo server, parses and returns the url query parameters:
 
-- restiq - 20.9k/s
+- [restiq] - 20.9k/s
 - [http] - 17.6k/s
 - [express] - 7.9k/s
 - [restify] - 4.6k/s (8k/s using just the http methods)
@@ -113,7 +113,7 @@ Canonical server using [http]:
     server.listen(1337, '127.0.0.1');
     // 17.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
-With restiq:
+With [restiq]:
 
     var Restiq = require('restiq');
     var app = Restiq.createServer({readImmediate: 0});
@@ -140,7 +140,7 @@ With [restify]:
     app.listen(1337);
     // 4.6k/s  wrk -d8s -t2 -c8 'http://localhost:1337/echo?a=1'
 
-Change just the first two lines to run it under restiq:
+Change just the first two lines to run it under [restiq]:
 
     var restify = require('restiq');
     var app = restify.createServer({restify: true});
@@ -509,3 +509,4 @@ Todo
 [http.IncomingMessage]: https://www.nodejs.org/api/http.html#http_http_incomingmessage
 and
 [http.ServerResponse]: https://www.nodejs.org/api/http.html#http_class_http_serverresponse
+[restiq]: https://github.com/andrasq/node-restiq
