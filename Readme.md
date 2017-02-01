@@ -151,8 +151,8 @@ Change just the first two lines to run it under [restiq]:
 Methods
 -------
 
-### `restiq( options )`
-### `restiq.createServer( options )`
+### restiq( options )
+### restiq.createServer( options )
 
 Create a new app.  The `createServer` method returns a newly created app with
 no routes and no middleware steps that is not yet listening for connections.
@@ -189,13 +189,13 @@ The options:
         var app = restiq.createServer(options);
 
 
-### `app.listen( port, [hostname], [backlog], [confirmationCallback] )`
+### app.listen( port, [hostname], [backlog], [confirmationCallback] )
 
 Start the service.  If given, `confirmationCallback` will be invoked when
 the service is ready to receive requests.  Hostname and backlog as for
 `http.createServer`.
 
-### `app.addStep( func, [where] )`
+### app.addStep( func, [where] )
 
 Add a processing step to the middleware stack.  Each step is a function
 `step(req, res, next)` taking request, response and a next-step callback.
@@ -225,7 +225,7 @@ call processing proper.  The after steps are for shared post-call wrapup, for
 successful calls.  The finally steps are run as the call teardown, and can do
 the logging, analytics reporting, etc.
 
-### `app.addRoute( method, path, [options], handlers )`
+### app.addRoute( method, path, [options], handlers )
 
 Register a path along with a middleware step function (or array of functions)
 to handle requests for it.  Returns a route object that can be used to remove
@@ -248,13 +248,13 @@ Options:
 - TBD; none right now.
 
 
-### `app.removeRoute( route )`
+### app.removeRoute( route )
 
 Remove a previously added route.  The removed route can be re-added later with
 `addRoute(route)`.
 
 
-### `app.mapRoute( method, path )`
+### app.mapRoute( method, path )
 
 For internal use, look up the route for the call.
 
@@ -278,34 +278,34 @@ Note getting the route extracts only the path params; the query string
 params can be gotten with `app.mw.parseQueryParams()`.
 
 
-`restiq.mw`
------------
+restiq.mw
+---------
 
 A library of pre-written middleware utility functions.
 
-### `restiq.mw.parseQueryParams( req, res, next )`
+### restiq.mw.parseQueryParams( req, res, next )
 
 Merge the query string parameters into `req.params`.
 
-### `restiq.mw.parseRouteParams( req, res, next )`
+### restiq.mw.parseRouteParams( req, res, next )
 
 Merge the parameters embedded in the request path into `req.params`.  This is
 done automatically as soon as the route is mapped, but explicit param parsing
 can override these values.  Re-merging allows control of the param source
 precedence.
 
-### `restiq.mw.parseBodyParams( req, res, next )`
+### restiq.mw.parseBodyParams( req, res, next )
 
 Merge the query string parameters from the body into `req.params`.  Will read
 the body with `mw.readBody` if it has not been read already.
 
-### `restiq.mw.readBody( req, res, next )`
+### restiq.mw.readBody( req, res, next )
 
 Gather up the message that was sent with the http request, and save it in
 `req.body`.  This call is safe to call more than once, but sets body only the
 first time.
 
-### `restiq.mw.skipBody( req, res, next )`
+### restiq.mw.skipBody( req, res, next )
 
 If the request body is guaranteed to be empty, it is faster to skip waiting
 for the `on('end')` event.  Be careful when using this:  if the request has a
@@ -318,13 +318,13 @@ Restify Compatibility Layer
 This is what I have so far --
 
 
-### `app.pre( func )`
+### app.pre( func )
 
 Add shared middleware step to be called before every request, before the
 request is routed.  Pre steps are called in the order added.
 
 
-### `app.use( func )`
+### app.use( func )
 
 Add shared middleware step to be called before every request after the `pre()`
 steps have all finished.  Each routed call will run only those use steps that
@@ -332,48 +332,48 @@ existed at the time it was added; use steps added after a route is added will
 not be run by that route.  Use steps are run in the order added.
 
 
-### `app.get( path, handler, [handler2, ...] )`
+### app.get( path, handler, [handler2, ...] )
 
 Add a GET route, with handlers to run in the order listed
 
 
-### `app.post( path, handler, [handler2, ...] )`
+### app.post( path, handler, [handler2, ...] )
 
 Add a POST route, with handlers to run in the order listed
 
 
-### `app.put( path, handler, [handler2, ...] )`
+### app.put( path, handler, [handler2, ...] )
 
 Add a PUT route, with handlers to run in the order listed
 
 
-### `app.delete( path, handler, [handler2, ...] )`
+### app.delete( path, handler, [handler2, ...] )
 
 Add a DELETE route, with handlers to run in the order listed.
 This call is also available as `app.del`.
 
 
-### `restiq.queryParser( )`
+### restiq.queryParser( )
 
 Returns a middleware `function(req, res, next)` that will extract the http query
 string parameters and place them in `req.params`
 
 
-### `restiq.authorizationParser( )`
+### restiq.authorizationParser( )
 
 Returns a middleware `function(req, res, next)` that will decode an
 `Authorization: Basic` header and set the fields `req.authorization.username`,
 `req.authorization.basic.username` and `req.authorization.basic.password`.
 
 
-### `restiq.bodyParser( )`
+### restiq.bodyParser( )
 
 Returns a middleware `function(req, res, next)` that will decode the request
 body into an object, string or Buffer.  The decoding is ad-hoc based on the
 incoming data type, and is not driven by the request headers.
 
 
-### `restiq.acceptParser( )`
+### restiq.acceptParser( )
 
 Sets the response content-encoding to the preferred (first) acceptable
 response type specified in the request that is supported by the server.
@@ -381,39 +381,39 @@ Restiq assumes the acceptable encodings are listed in order of preference.
 Throws a 406 Not Acceptable error if no match is found.
 
 
-### `req.getId( )`
+### req.getId( )
 
 returns the request id contained in the request headers.  Unlike restify,
 restiq uses a dash `-` if can't find one, and  does not make one up.
 
 
-### `req.version( )`
+### req.version( )
 
 Returns the options.version string that was passed to `createServer()`.
 
 
-### `req.header( name, [defaultValue] )`
+### req.header( name, [defaultValue] )
 
 Return the named header field, or `defaultValue` if that header field was not
 specified in the request.
 
 
-### `req.path( )`
+### req.path( )
 
 Returns `req.url`.
 
 
-### `res.header( name, value )`
+### res.header( name, value )
 
 Set a header value, aka `writeHeader`.
 
 
-### `res.get( name )`
+### res.get( name )
 
 Read back a set header value.
 
 
-### `res.send( [statusCode], [response] )`
+### res.send( [statusCode], [response] )
 
 Send a response.  The default status code is 200, the default response the
 empty string.  The call determines the content type from the response value,
