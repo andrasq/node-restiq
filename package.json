@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "qhttp": "0.0.6",
-    "aflow": "0.9.3"
+    "aflow": "0.10.1"
   },
   "devDependencies": {
     "qmock": "0.0.8",
