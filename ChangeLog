@@ -1,3 +1,8 @@
+0.6.3
+- restify compat: provide res._body
+- restify compat: suppress errors from `after`
+- run tests with qnit
+
 0.6.2
 - fix potential null deref on unmapped routes
 - new .gitignore

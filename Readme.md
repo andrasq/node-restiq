@@ -1,20 +1,19 @@
 restiq
 ======
 
-Smaller, lighter, faster framework for REST API's, in the spirit of [restify].
+Smaller, lighter, faster framework for REST APIs.
 
 Lean and fast for low-latency micro-services where overhead is important.
-Depending on the app, can serve 20k requests / second or more, and 18k / sec
-for more complex apps.
+Depending on the app, can serve 20k requests / second or more.
 
-The basics are working -- route mapping, route decoding, pre-, post- and
-per-route middleware stacks.  Errors are caught and converted into HTTP 500
-responses.  Unmapped routes return 405 errors.  The calls themselves can
-return any HTTP status code.
+There are not a lot of frills, but provides route mapping, route decoding,
+pre-, post- and per-route middleware stacks.  Errors are caught and converted
+into HTTP 500 responses.  Unmapped routes return 405 errors.  The calls
+themselves can return any HTTP status code.
 
-There are not a lot of frills yet, but I was able to swap out restify in a
-fairly complex app and have all its unit tests pass.  The app runs 40-50% more
-calls per second on [restiq] than before.
+Optionally some `restify` compatibility.  I was able to swap out restify in a
+fairly complex app and have all its unit tests pass, and the app runs 40-50% more
+calls per second on restiq than on restify.
 
     var restiq = require('restiq');
     var app = restiq.createServer();
@@ -500,6 +499,7 @@ Todo
 - make routing a mw step, to help w/ path rewriting (to route, edit, re-route)
 - support limit on max request size? (error out if too big)
 - call versioning
+- time koa, meteor, (sails = express,) derby, socketstream mvc frameworks
 
 Related Work:
 - [express](https://www.npmjs.com/package/express) - https://expressjs.com/
@@ -510,4 +510,3 @@ and
 - [http.ServerResponse](https://www.nodejs.org/api/http.html#http_class_http_serverresponse) - https://www.nodejs.org/api/http.html#http_class_http_serverresponse
 - [restify](https://www.npmjs.com/package/restify) - http://restify.com/
 - [restiq](https://www.npmjs.com/package/restiq) - https://www.npmjs.com/package/restiq
-
