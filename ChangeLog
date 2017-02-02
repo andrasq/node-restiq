@@ -1,3 +1,8 @@
+0.6.2
+- fix potential null deref on unmapped routes
+- new .gitignore
+- fix and clean up Readme, thanks @fidian!
+
 0.6.1
 - add req.path() compat method
 - tolerate double-close
