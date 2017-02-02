@@ -502,11 +502,11 @@ Todo
 - call versioning
 
 
-[express]: https://expressjs.com/
-[hapi]: https://hapijs.com/
-[restify]: http://restify.com/
+[express]: https://www.npmjs.com/package/express
+[hapi]: https://www.npmjs.com/package/hapi
 [http]: https://nodejs.org/api/http.html
 [http.IncomingMessage]: https://www.nodejs.org/api/http.html#http_http_incomingmessage
 and
 [http.ServerResponse]: https://www.nodejs.org/api/http.html#http_class_http_serverresponse
-[restiq]: https://github.com/andrasq/node-restiq
+[restify]: https://www.npmjs.com/package/restify
+[restiq]: https://www.npmjs.com/package/restiq
