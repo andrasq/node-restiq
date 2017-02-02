@@ -502,11 +502,18 @@ Todo
 - time koa, meteor, (sails = express,) derby, socketstream mvc frameworks
 
 Related Work:
-- [express](https://www.npmjs.com/package/express) - https://expressjs.com/
-- [hapi](https://www.npmjs.com/package/hapi) - https://hapijs.com/
-- [http](https://nodejs.org/api/http.html) - https://nodejs.org/api/http.html
-- [http.IncomingMessage](https://www.nodejs.org/api/http.html#http_http_incomingmessage) - https://www.nodejs.org/api/http.html#http_http_incomingmessage
-and
-- [http.ServerResponse](https://www.nodejs.org/api/http.html#http_class_http_serverresponse) - https://www.nodejs.org/api/http.html#http_class_http_serverresponse
-- [restify](https://www.npmjs.com/package/restify) - http://restify.com/
-- [restiq](https://www.npmjs.com/package/restiq) - https://www.npmjs.com/package/restiq
+- [express] - https://expressjs.com/
+- [hapi] - https://hapijs.com/
+- [http] - https://nodejs.org/api/http.html
+- [http.IncomingMessage] - https://www.nodejs.org/api/http.html#http_http_incomingmessage
+- [http.ServerResponse] - https://www.nodejs.org/api/http.html#http_class_http_serverresponse
+- [restify] - http://restify.com/
+- [restiq] - https://www.npmjs.com/package/restiq
+
+[express]: https://www.npmjs.com/package/express
+[hapi]: https://www.npmjs.com/package/hapi
+[http]: https://nodejs.org/api/http.html
+[http.IncomingMessage]: https://www.nodejs.org/api/http.html#http_http_incomingmessage
+[http.ServerResponse]: https://www.nodejs.org/api/http.html#http_class_http_serverresponse
+[restify]: https://www.npmjs.com/package/restify
+[restiq]: https://www.npmjs.com/package/restiq
