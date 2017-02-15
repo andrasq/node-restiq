@@ -280,7 +280,8 @@ params can be gotten with `app.mw.parseQueryParams()`.
 restiq.mw
 ---------
 
-A library of pre-written middleware utility functions.
+A library of pre-written middleware utility functions. All middleware is
+additionally exposed as a factory.
 
 ### restiq.mw.parseQueryParams( req, res, next )
 
@@ -304,12 +305,61 @@ Gather up the message that was sent with the http request, and save it in
 `req.body`.  This call is safe to call more than once, but sets body only the
 first time.
 
+### restiq.mw.discardBody( req, res, next )
+
+Reads and discards request body forcing the end event on the request.
+
 ### restiq.mw.skipBody( req, res, next )
 
 If the request body is guaranteed to be empty, it is faster to skip waiting
 for the `on('end')` event.  Be careful when using this:  if the request has a
 body it needs to be consumed.
 
+### restiq.mw.buildReadBody(options)
+
+Returns `restiq.mw.readBody`.
+
+#### options
+
+`maxBodySize` - The maximum request body size to enforce. If this is a number, then the value specifies the number of
+bytes; if it is a string, the value is parsed by bytes. Defaults to '100kb'. Exceeding this value results in a
+`400 BadRequest` error response.
+
+### restiq.mw.buildParseBody(options)
+
+Returns `restiq.mw.parseBody`.
+
+#### options
+
+`maxBodySize` - The maximum request body size to enforce. If this is a number, then the value specifies the number of
+bytes; if it is a string, the value is parsed by bytes. Defaults to '100kb'. Exceeding this value results in a
+`400 BadRequest` error response.
+
+### restiq.mw.buildParseBodyParams(options)
+
+Returns `restiq.mw.parseBodyParams`.
+
+#### options
+
+`maxBodySize` - The maximum request body size to enforce. If this is a number, then the value specifies the number of
+bytes; if it is a string, the value is parsed by bytes. Defaults to '100kb'. Exceeding this value results in a
+`400 BadRequest` error response.
+
+### restiq.mw.buildParseQueryParams()
+
+Returns `restiq.mw.parseQueryParams`.
+
+### restiq.mw.buildParseRouteParams()
+
+Returns `restiq.mw.parseRouteParams`.
+
+### restiq.mw.buildDiscardBody()
+
+Returns `restiq.mw.discardBody`.
+
+### restiq.mw.buildSkipBody()
+
+Returns `restiq.mw.skipBody`.
 
 Restify Compatibility Layer
 ---------------------------
@@ -482,8 +532,6 @@ Todo
 - compat: emit restify error events, see http://mcavage.me/node-restify/ #Server+Api
 - compat: expose address(), listen(), close()
 - compat: make parsed query params available in req.query
-- ? make readBody support a max body size limit ?
-- ? offer mw step builders, to accept params?  eg mw.buildReadBody({maxBodySize: 1000}) vs mw.readBody;
 - speed: time w/ bunyan vs w/ qlogger (close, 1820 vs 1750 4% restiq, 1177 vs 1066 8% restify)
 - revisit send(), support headers
 - make addStep() support array of GET, POST etc methods

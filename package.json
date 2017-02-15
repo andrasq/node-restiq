@@ -28,8 +28,9 @@
     "express"
   ],
   "dependencies": {
-    "qhttp": "0.0.6",
-    "aflow": "0.10.1"
+    "aflow": "0.10.1",
+    "bytes": "^2.4.0",
+    "qhttp": "0.0.6"
   },
   "devDependencies": {
     "qmock": "0.0.8",
