@@ -315,7 +315,7 @@ options
 
 ### restiq.mw.discardBody( req, res, next )
 
-Reads and discards request body to force the end event on the request.
+Reads and discards request body to force the `end` event on the request.
 `buildDiscardBody` returns this middleware function.
 
 ### restiq.mw.skipBody( req, res, next )
