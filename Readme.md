@@ -321,9 +321,7 @@ Returns `restiq.mw.readBody`.
 
 #### options
 
-`maxBodySize` - The maximum request body size to enforce. If this is a number, then the value specifies the number of
-bytes; if it is a string, the value is parsed by bytes. Defaults to '100kb'. Exceeding this value results in a
-`400 BadRequest` error response.
+`maxBodySize` - The maximum request body size to enforce in bytes. Exceeding this value results in a `400 BadRequest` error response. There is no limit set by default.
 
 ### restiq.mw.buildParseBody(options)
 
@@ -331,9 +329,7 @@ Returns `restiq.mw.parseBody`.
 
 #### options
 
-`maxBodySize` - The maximum request body size to enforce. If this is a number, then the value specifies the number of
-bytes; if it is a string, the value is parsed by bytes. Defaults to '100kb'. Exceeding this value results in a
-`400 BadRequest` error response.
+`maxBodySize` - The maximum request body size to enforce in bytes. Exceeding this value results in a `400 BadRequest` error response. There is no limit set by default.
 
 ### restiq.mw.buildParseBodyParams(options)
 
@@ -341,9 +337,7 @@ Returns `restiq.mw.parseBodyParams`.
 
 #### options
 
-`maxBodySize` - The maximum request body size to enforce. If this is a number, then the value specifies the number of
-bytes; if it is a string, the value is parsed by bytes. Defaults to '100kb'. Exceeding this value results in a
-`400 BadRequest` error response.
+`maxBodySize` - The maximum request body size to enforce in bytes. Exceeding this value results in a `400 BadRequest` error response. There is no limit set by default
 
 ### restiq.mw.buildParseQueryParams()
 

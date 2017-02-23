@@ -29,7 +29,6 @@
   ],
   "dependencies": {
     "aflow": "0.10.1",
-    "bytes": "^2.4.0",
     "qhttp": "0.0.6"
   },
   "devDependencies": {
