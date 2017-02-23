@@ -281,23 +281,25 @@ restiq.mw
 ---------
 
 A library of pre-written middleware utility functions. All middleware is
-additionally exposed as a factory.
+also exposed through a configurable factory function.
 
 ### restiq.mw.parseQueryParams( req, res, next )
 
-Merge the query string parameters into `req.params`.
+Merge the query string parameters into `req.params`. `buildParseQueryParams()`
+returns this middleware function.
 
 ### restiq.mw.parseRouteParams( req, res, next )
 
 Merge the parameters embedded in the request path into `req.params`.  This is
 done automatically as soon as the route is mapped, but explicit param parsing
 can override these values.  Re-merging allows control of the param source
-precedence.
+precedence. `buildParseRouteParams()` returns this middleware function.
 
 ### restiq.mw.parseBodyParams( req, res, next )
 
 Merge the query string parameters from the body into `req.params`.  Will read
 the body with `restiq.mw.readBody` if it has not been read already.
+`buildParseBodyParams()` returns this middleware function.
 
 ### restiq.mw.readBody( req, res, next )
 
@@ -305,55 +307,23 @@ Gather up the message that was sent with the http request, and save it in
 `req.body`.  This call is safe to call more than once, but sets body only the
 first time.
 
+`buildReadBodyParams(options)` returns the readBody middleware function.
+
+options
+
+`maxBodySize` - The maximum request body size to enforce in bytes. Exceeding this value results in a `400 BadRequest` error response. There is no limit set by default.
+
 ### restiq.mw.discardBody( req, res, next )
 
-Reads and discards request body forcing the end event on the request.
+Reads and discards request body to force the end event on the request.
+`buildDiscardBody` returns this middleware function.
 
 ### restiq.mw.skipBody( req, res, next )
 
 If the request body is guaranteed to be empty, it is faster to skip waiting
 for the `on('end')` event.  Be careful when using this:  if the request has a
-body it needs to be consumed.
+body it needs to be consumed. `buildSkipBody` returns this middleware function.
 
-### restiq.mw.buildReadBody(options)
-
-Returns `restiq.mw.readBody`.
-
-#### options
-
-`maxBodySize` - The maximum request body size to enforce in bytes. Exceeding this value results in a `400 BadRequest` error response. There is no limit set by default.
-
-### restiq.mw.buildParseBody(options)
-
-Returns `restiq.mw.parseBody`.
-
-#### options
-
-`maxBodySize` - The maximum request body size to enforce in bytes. Exceeding this value results in a `400 BadRequest` error response. There is no limit set by default.
-
-### restiq.mw.buildParseBodyParams(options)
-
-Returns `restiq.mw.parseBodyParams`.
-
-#### options
-
-`maxBodySize` - The maximum request body size to enforce in bytes. Exceeding this value results in a `400 BadRequest` error response. There is no limit set by default
-
-### restiq.mw.buildParseQueryParams()
-
-Returns `restiq.mw.parseQueryParams`.
-
-### restiq.mw.buildParseRouteParams()
-
-Returns `restiq.mw.parseRouteParams`.
-
-### restiq.mw.buildDiscardBody()
-
-Returns `restiq.mw.discardBody`.
-
-### restiq.mw.buildSkipBody()
-
-Returns `restiq.mw.skipBody`.
 
 Restify Compatibility Layer
 ---------------------------
