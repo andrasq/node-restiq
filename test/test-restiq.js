@@ -17,6 +17,9 @@ module.exports = {
             t.ok(Restiq.mw.parseQueryParams);
             t.ok(Restiq.mw.parseBodyParams);
             t.ok(Restiq.mw.readBody);
+            t.ok(Restiq.mw.buildParseQueryParams());
+            t.ok(Restiq.mw.buildParseBodyParams());
+            t.ok(Restiq.mw.buildReadBody());
             t.done();
         },
 
@@ -95,6 +98,49 @@ module.exports = {
                 t.done();
             });
         },
+
+        'should dispose of body': function(t) {
+            req = new http.IncomingMessage();
+            req.push("Not going to use this");
+            req.push(null);
+            // Simulating setEncoding since that is not available on the mock.
+            t.expect(1);
+            Restiq.mw.discardBody(req, {}, function(err) {
+                t.ok(!err);
+                t.done();
+            });
+        },
+
+        'should sucessfully read body as a string': function(t) {
+            req = new http.IncomingMessage();
+            req.restiq = {
+                _opts: {}
+            };
+            req.push("Just some data bro");
+            req.push(null);
+            t.expect(1);
+            Restiq.mw.readBody(req, {}, function(err) {
+                t.ok(!err);
+                t.done();
+            });
+        },
+
+        'should fail to parse body due to maxBodySize being exceeded': function(t) {
+            req = new http.IncomingMessage();
+            req.restiq = {
+                _opts: {
+                    readBinary: true
+                }
+            };
+            req.push("Just some data bro");
+            req.push(null);
+            t.expect(2);
+            Restiq.mw.buildReadBody({maxBodySize: 1})(req, {}, function(err) {
+                t.ok(err);
+                t.equal(err.message, 'Error reading body, max request body size exceeded.');
+                t.done();
+            });
+        }
     },
 
     'restiq app setup': {
