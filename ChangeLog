@@ -1,3 +1,7 @@
+0.7.0
+- middleware builder functions
+- maxBodySize readBody and parseReadBodyParams option
+
 0.6.3
 - restify compat: provide res._body
 - restify compat: suppress errors from `after`
