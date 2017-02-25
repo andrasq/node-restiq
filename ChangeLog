@@ -1,3 +1,6 @@
+0.7.1
+- faster readBody() data chunk concatenation
+
 0.7.0
 - middleware builder functions
 - maxBodySize readBody and parseReadBodyParams option
