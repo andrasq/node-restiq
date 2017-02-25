@@ -1,5 +1,8 @@
 0.7.1
 - faster readBody() data chunk concatenation
+- list qmock as a dependency (been one since 2015)
+- fix: always return a Buffer in readBinary mode
+- fix: parseAuthorization mw should run ok without a callback
 
 0.7.0
 - middleware builder functions
