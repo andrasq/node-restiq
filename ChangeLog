@@ -1,3 +1,7 @@
+0.7.2
+- add to ci and coverage tests
+- test with qnit 0.15.1 with fixed failure exitcode
+
 0.7.1
 - faster readBody() data chunk concatenation
 - list qmock as a dependency (been one since 2015)

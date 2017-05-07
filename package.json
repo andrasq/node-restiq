@@ -1,6 +1,6 @@
 {
   "name": "restiq",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "smaller, faster, lighter-weight REST micro-framework",
   "license": "Apache-2.0",
   "main": "index.js",
@@ -16,7 +16,10 @@
     "node": ">0.0.0"
   },
   "scripts": {
-    "test": "qnit test"
+    "test": "qnit test",
+    "coverage": "nyc --reporter lcov --reporter text npm test",
+    "clean": "rm -rf .nyc_output coverage",
+    "coveralls": "nyc --reporter text-lcov npm test | coveralls"
   },
   "keywords": [
     "Andras",
@@ -34,6 +37,6 @@
   },
   "devDependencies": {
     "qmock": "0.0.8",
-    "qnit": "0.11.0"
+    "qnit": "0.15.1"
   }
 }
