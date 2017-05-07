@@ -33,7 +33,7 @@
   "dependencies": {
     "aflow": "0.10.1",
     "qhttp": "0.0.6",
-    "qmock": "^0.2.0"
+    "qmock": "0.5.0"
   },
   "devDependencies": {
     "qmock": "0.0.8",
