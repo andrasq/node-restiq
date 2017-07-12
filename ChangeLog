@@ -4,6 +4,7 @@
 - fix typo in makeError source string
 - use newer qmock
 - update dependencies (no need for qmock, yes for querystring)
+- guard against possible null deref in rlib
 
 0.7.1
 - faster readBody() data chunk concatenation
