@@ -3,7 +3,7 @@
 if (process.argv[1].indexOf('nodeunit') >= 0 || process.argv[1].indexOf('qnit') >= 0) return;
 
 var http = require('http');
-var qmock = require('qmock');
+var qmock = require('qnit').qmock;
 
 var rlib = require('../lib/rlib');
 

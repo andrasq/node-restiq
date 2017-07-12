@@ -1,6 +1,9 @@
 0.7.2
 - add to ci and coverage tests
 - test with qnit 0.15.1 with fixed failure exitcode
+- fix typo in makeError source string
+- use newer qmock
+- update dependencies (no need for qmock, yes for querystring)
 
 0.7.1
 - faster readBody() data chunk concatenation
