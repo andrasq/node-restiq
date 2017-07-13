@@ -1,7 +1,7 @@
 var http = require('http');
 var url = require('url');
 var Restiq = require('../index');
-var qmock = require('qmock');
+var qmock = require('qnit').qmock;
 
 var HttpClient = require('../http-client');
 
