@@ -1,3 +1,8 @@
+0.7.3
+- only set the restify error handler once at start, to allow caller to override
+- restify compat: not a restify error if parseBody cannot decode body (with mapParams:false)
+- fix parseBody to set to decoded if it decodes to falsy
+
 0.7.2
 - add to ci and coverage tests
 - test with qnit 0.15.1 with fixed failure exitcode
