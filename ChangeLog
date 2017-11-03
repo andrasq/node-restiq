@@ -1,3 +1,8 @@
+0.7.4
+- apply restify emulation before the route is mapped, to have res.send available in unit tests
+- check that the middleware error.code is a plausible 3 digit http status before using it
+- upgrade to qhttp-0.6.0
+
 0.7.3
 - only set the restify error handler once at start, to allow caller to override
 - restify compat: not a restify error if parseBody cannot decode body (with mapParams:false)
