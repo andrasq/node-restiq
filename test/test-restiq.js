@@ -210,7 +210,7 @@ module.exports = {
         },
     },
 
-    'restic app middleware': {
+    'restiq app middleware': {
         setUp: function(done) {
             var self = this;
             this.app = Restiq.createServer();
@@ -307,6 +307,69 @@ module.exports = {
                 });
             //});
             });
+        },
+
+        'should stop middleware on false': function(t) {
+            var app = this.app;
+            var step1called = false, step2called = false;
+            app.addStep(function(req, res, next) { step1called = true; next(false) });
+            app.addStep(function(req, res, next) { step2called = true; next() });
+            app.addRoute('GET', '/echo', function(req, res, next) { res.end("OK") });
+            var self = this;
+            app.listen(21337, function() {
+                self.httpClient.call('GET', 'http://localhost:21337/echo', function(err, res) {
+                    t.ifError(err);
+                    t.equal(res.statusCode, 200);
+                    t.strictEqual(step1called, true);
+                    t.strictEqual(step2called, false);
+                    app.close();
+                    t.done();
+                })
+            })
+        },
+
+        'should stop middleware but run finally in case of error': function(t) {
+            var app = this.app;
+            var step1called = false, step2called = false, finallyCalled = false;
+            app.addStep(function(req, res, next) { step1called = true; next(new Error("test error")) });
+            app.addStep(function(req, res, next) { step2called = true; next() });
+            app.addStep('finally', function(req, res, next) { finallyCalled = true; next() });
+            app.addRoute('GET', '/echo', function(req, res, next) { res.end("OK") });
+            var self = this;
+            app.listen(21337, function() {
+                self.httpClient.call('GET', 'http://localhost:21337/echo', function(err, res) {
+                    t.ifError(err);
+                    t.equal(res.statusCode, 500);
+                    t.strictEqual(step1called, true);
+                    t.strictEqual(step2called, false);
+                    t.strictEqual(finallyCalled, true);
+                    app.close();
+                    t.done();
+                })
+            })
+        },
+
+        'should stop middleware on uncaught exception': function(t) {
+            var app = this.app;
+            var step1called = false, step2called = false, finally1called = false, finally2called = false;
+            app.addStep('finally', function(req, res, next) { finally1called = true; next() });
+            app.addStep(function(req, res, next) { step1called = true; throw new Error("test error") });
+            app.addStep(function(req, res, next) { step2called = true; next() });
+            app.addStep('finally', function(req, res, next) { finally2called = true; next() });
+            app.addRoute('GET', '/echo', function(req, res, next) { res.end("OK") });
+            var self = this;
+            app.listen(21337, function() {
+                self.httpClient.call('GET', 'http://localhost:21337/echo', function(err, res) {
+                    t.ifError(err);
+                    t.equal(res.statusCode, 500);
+                    t.strictEqual(step1called, true);
+                    t.strictEqual(step2called, false);
+                    t.strictEqual(finally1called, true);
+                    t.strictEqual(finally2called, true);
+                    app.close();
+                    t.done();
+                })
+            })
         },
     },
 };

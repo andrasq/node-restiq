@@ -521,7 +521,6 @@ Todo
 - support limit on max request size? (error out if too big)
 - call versioning
 - time koa, meteor, (sails = express,) derby, socketstream mvc frameworks
-- make addStep accept the `where` before the middleware function(s)
 
 Related Work:
 - [express] - https://expressjs.com/
