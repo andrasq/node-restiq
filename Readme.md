@@ -194,6 +194,12 @@ Start the service.  If given, `confirmationCallback` will be invoked when
 the service is ready to receive requests.  Hostname and backlog as for
 `http.createServer`.
 
+### app.setErrorHandler( onError(req, res, err, next) )
+
+Use the provided `onError` function to handle middleware errors.  The default error
+handler extracts an http status code from `err`, else returns a 500 Internal Server
+Error response.
+
 ### app.addStep( func, [where] )
 
 Add a processing step to the middleware stack.  Each step is a function
@@ -502,7 +508,6 @@ Todo
 - compat: make parsed query params available in req.query
 - speed: time w/ bunyan vs w/ qlogger (close, 1820 vs 1750 4% restiq, 1177 vs 1066 8% restify)
 - revisit send(), support headers
-- make addStep() support array of GET, POST etc methods
 - save the response err to be available in finally steps
 - ? save the response body to be available in finally steps
 - alias the more common restify errors
@@ -516,6 +521,7 @@ Todo
 - support limit on max request size? (error out if too big)
 - call versioning
 - time koa, meteor, (sails = express,) derby, socketstream mvc frameworks
+- make addStep accept the `where` before the middleware function(s)
 
 Related Work:
 - [express] - https://expressjs.com/
