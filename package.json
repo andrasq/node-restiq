@@ -35,6 +35,6 @@
     "querystring": "0.2.0"
   },
   "devDependencies": {
-    "qnit": "0.15.1"
+    "qnit": "0.18.1"
   }
 }

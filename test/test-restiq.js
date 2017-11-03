@@ -219,6 +219,45 @@ module.exports = {
             done();
         },
 
+        'should addStep': function(t) {
+            function f1(){}
+            function f2(){}
+            function f3(){}
+            function f4(){}
+
+            // add middleware steps, function first
+            this.app.addStep(f1);
+            t.equal(this.app._before[0], f1);
+            this.app.addStep(f2, 'setup');
+            t.equal(this.app._setup[0], f2);
+            this.app.addStep(f3, 'after');
+            t.equal(this.app._after[0], f3);
+            this.app.addStep(f4, 'finally');
+            t.equal(this.app._finally.pop(), f4);
+            
+            // add middleware steps, function last
+            this.app.addStep('use', f1);
+            t.equal(this.app._before[1], f1);
+            this.app.addStep('setup', f2);
+            t.equal(this.app._setup[1], f2);
+            this.app.addStep('after', f3);
+            t.equal(this.app._after[1], f3);
+            this.app.addStep('finally', f4);
+            t.equal(this.app._finally.pop(), f4);
+
+            // add array of functions
+            this.app.addStep('use', [f1, f2, f3]);
+            t.equal(this.app._before.pop(), f3);
+
+            // throws on invalid function
+            try { this.app.addStep(123); t.fail() }
+            catch (err) { t.contains(err.message, "must be a function") }
+            try { this.app.addStep(f1, "noplace"); t.fail() }
+            catch (err) { t.contains(err.message, "unknown") }
+
+            t.done();
+        },
+
         'should run pre steps': function(t) {
             var app = this.app;
             var httpClient = this.httpClient;

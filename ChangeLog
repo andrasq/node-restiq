@@ -2,6 +2,8 @@
 - apply restify emulation before the route is mapped, to have res.send available in unit tests
 - check that the middleware error.code is a plausible 3 digit http status before using it
 - upgrade to qhttp-0.6.0
+- document setErrorHandler
+- let addStep(func, where) accept its args in either order
 
 0.7.3
 - only set the restify error handler once at start, to allow caller to override
