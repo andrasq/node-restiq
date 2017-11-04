@@ -41,6 +41,12 @@ module.exports = {
             t.done();
         },
 
+        'error should use user message': function(t) {
+            var e= new Restiq.errors[404]('user message');
+            t.equal(e.message, 'user message');
+            t.done();
+        },
+
         'should create app': function(t) {
             var app = Restiq.createServer();
             t.ok(app instanceof Restiq);
@@ -307,6 +313,22 @@ module.exports = {
                 });
             //});
             });
+        },
+
+        'should run "finally" for unmapped routes': function(t) {
+            var self = this;
+            var called = false;
+            self.app.addStep('finally', function(req, res, next) { called = true; next() });
+            self.app.listen(21337, function(err) {
+                t.ifError(err);
+                self.httpClient.call('GET', '/nonesuch', function(err, res) {
+                    t.ifError(err);
+                    t.equal(called, true);
+                    t.equal(res.statusCode, 404);
+                    self.app.close();
+                    t.done();
+                })
+            })
         },
 
         'should emit "after" when mw stack is done': function(t) {
