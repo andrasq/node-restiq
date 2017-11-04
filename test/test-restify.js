@@ -1,4 +1,5 @@
 var assert = require('assert');
+var http = require('http');
 var Restiq = require('../index');
 
 module.exports = {
@@ -9,6 +10,14 @@ module.exports = {
 
     'should create a restify mimic app': function(t) {
         var app = new Restiq({restify: true});
+        t.done();
+    },
+
+    'should set app._emulateRestify': function(t) {
+        var app1 = new Restiq({});
+        var app2 = new Restiq({ restify: true });
+        t.ok(!app1._emulateRestify);
+        t.equal(app2._emulateRestify, true);
         t.done();
     },
 

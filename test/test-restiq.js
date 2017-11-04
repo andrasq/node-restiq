@@ -309,6 +309,60 @@ module.exports = {
             });
         },
 
+        'should emit "after" when mw stack is done': function(t) {
+            var app = this.app;
+            app._emulateRestify = true;
+            app.listen(21337);
+
+            var stepCount = 0;
+            app.addStep('setup', function(req, res, next) { stepCount += 1; next() });
+            app.addStep('use', function(req, res, next) { stepCount += 1; next() });
+            app.addRoute('GET', '/ping', function(req, res, next) {
+                stepCount += 1;
+                res.end('OK');
+                next();
+            })
+
+            afterCalled = false;
+            app.on('after', function(req, res, route, next) {
+                afterCalled = stepCount;
+                next();
+            })
+            var req = http.request("http://localhost:21337/ping", function(res) {
+                t.equal(afterCalled, 3);
+                app.close();
+                t.done();
+            })
+            req.end("");
+        },
+
+        'should emit "uncaughtException" on error': function(t) {
+            var app = this.app;
+            app._emulateRestify = true;
+
+            var calledError, testError = new Error("test error");
+            app.on('uncaughtException', function(req, res, route, err) {
+                calledError = err;
+            })
+            app.addStep(function(req, res, next) {
+                throw testError;
+            })
+            app.addRoute('GET', '/ping', function(req, res, next) {
+                res.end('OK');
+                next();
+            })
+            app.listen(21337);
+
+            this.httpClient.call('GET', 'http://localhost:21337/ping', function(err, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 500);
+                t.contains(res.body, 'middleware');
+                t.equal(calledError, testError);
+                app.close();
+                t.done();
+            })
+        },
+
         'should stop middleware on false': function(t) {
             var app = this.app;
             var step1called = false, step2called = false;
