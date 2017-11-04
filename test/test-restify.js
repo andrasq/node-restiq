@@ -1,3 +1,10 @@
+/**
+ * Copyright (C) 2015,2017 Andras Radics
+ * Licensed under the Apache License, Version 2.0
+ */
+
+'use strict';
+
 var assert = require('assert');
 var http = require('http');
 var Restiq = require('../index');

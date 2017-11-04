@@ -1,3 +1,8 @@
+/**
+ * Copyright (C) 2015,2017 Andras Radics
+ * Licensed under the Apache License, Version 2.0
+ */
+
 'use strict'
 
 if (process.argv[1].indexOf('nodeunit') >= 0 || process.argv[1].indexOf('qnit') >= 0) return;

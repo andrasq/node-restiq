@@ -1,3 +1,11 @@
+0.8.0
+- fix restiq.error.Error* to construct proper Errors
+- refactor middleware runner to always call the _finally steps
+
+0.7.6
+- restify compat: emit 'uncaughtException' on unhandled mw error
+- restify compat: experimental restiq.InvalidCredentialsError
+
 0.7.5
 - check that the middleware error.code is a plausible 3 digit http status before using it
 - upgrade to qhttp-0.6.0

@@ -1,3 +1,10 @@
+/**
+ * Copyright (C) 2015,2017 Andras Radics
+ * Licensed under the Apache License, Version 2.0
+ */
+
+'use strict';
+
 var http = require('http');
 var url = require('url');
 var Restiq = require('../index');
@@ -72,7 +79,7 @@ module.exports = {
 
     'restiq mw': {
         'should parse query params': function(t) {
-            req = {url: "/echo?a=1&b=2", params: {}};
+            var req = {url: "/echo?a=1&b=2", params: {}};
             t.expect(2);
             Restiq.mw.parseQueryParams(req, {}, function(err) {
                 t.ok(!err);
@@ -82,7 +89,7 @@ module.exports = {
         },
 
         'should parse body params (hierarchical and urldecoded)': function(t) {
-            req = {url: "/echo?a=1&b=2", body: "c[cc]=3&d%25=%25", _bodyEof: 1, params: {}};
+            var req = {url: "/echo?a=1&b=2", body: "c[cc]=3&d%25=%25", _bodyEof: 1, params: {}};
             t.expect(3);
             Restiq.mw.parseBodyParams(req, {}, function(err) {
                 t.ok(!err);
@@ -105,7 +112,7 @@ module.exports = {
         },
 
         'should dispose of body': function(t) {
-            req = new http.IncomingMessage();
+            var req = new http.IncomingMessage();
             req.push("Not going to use this");
             req.push(null);
             // Simulating setEncoding since that is not available on the mock.
@@ -117,7 +124,7 @@ module.exports = {
         },
 
         'should sucessfully read body as a string': function(t) {
-            req = new http.IncomingMessage();
+            var req = new http.IncomingMessage();
             req.restiq = {
                 _opts: {}
             };
@@ -131,7 +138,7 @@ module.exports = {
         },
 
         'should fail to parse body due to maxBodySize being exceeded': function(t) {
-            req = new http.IncomingMessage();
+            var req = new http.IncomingMessage();
             req.restiq = {
                 _opts: {
                     readBinary: true
@@ -345,7 +352,7 @@ module.exports = {
                 next();
             })
 
-            afterCalled = false;
+            var afterCalled = false;
             app.on('after', function(req, res, route, next) {
                 afterCalled = stepCount;
                 next();

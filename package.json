@@ -1,6 +1,6 @@
 {
   "name": "restiq",
-  "version": "0.7.7",
+  "version": "0.8.0",
   "description": "smaller, faster, lighter-weight REST micro-framework",
   "license": "Apache-2.0",
   "main": "index.js",
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test": "qnit test",
-    "coverage": "nyc --reporter lcov --reporter text npm test",
+    "coverage": "nyc --include lib --include index.js --reporter lcov --reporter text npm test",
     "clean": "rm -rf .nyc_output coverage"
   },
   "keywords": [
