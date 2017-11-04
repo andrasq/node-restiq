@@ -26,10 +26,9 @@ module.exports = {
         'should expose errors': function(t) {
             t.ok(Restiq.errors);
             t.ok(Restiq.errors['405']);
-            var e = new Restiq.errors[405]("msg");
+            var e = new Restiq.errors[405]("err msg");
             t.ok(e.code);
-            t.ok(e.message);
-            t.equal(e.message, 'msg');
+            t.equal(e.message, 'err msg');
             t.ok(e instanceof Error);
             t.ok(e.stack);
             t.done();
