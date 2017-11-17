@@ -473,8 +473,11 @@ Random observations on building fast REST services
 Todo
 ----
 
+- if route not found, look in a "method-less" routes table to customize error
+  "route not mapped" vs "POST not mapped"
+- make configurable what error to return on "route not mapped" (ie, restify 405 Method Not Allowed vs generic 404 Not Found)
 - unit tests
-- refactor internal functions into methods, for testability
+- expose internal functions for testability
 - would be handy to have decodeReqBody for decoding JSON and BSON request bodies
 - would be handy to have encodeResBody for encoding JSON and BSON response bodies
 - describe the built-in restify compatibily adapter
