@@ -1,3 +1,6 @@
+0.8.1
+- fix 0 'use' steps before the mapped route
+
 0.8.0
 - fix restiq.error.Error* to construct proper Errors
 - refactor middleware runner to always call the _finally steps
