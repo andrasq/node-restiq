@@ -1,5 +1,6 @@
 0.8.1
 - fix 0 'use' steps before the mapped route
+- make removeRoute accept routes from both mapRoute() and addRoute()
 
 0.8.0
 - fix restiq.error.Error* to construct proper Errors

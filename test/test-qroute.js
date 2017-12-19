@@ -29,5 +29,32 @@ module.exports = {
         t.done();
     },
 
+    'route should capture path parameters': function(t) {
+        this.cut.addRoute('/:entity/get/:field', ['mw-stack']);
+        var route = this.cut.mapRoute('/database1/get/table2?a=1');
+        t.deepEqual(route.vars, { entity: 'database1', field: 'table2' });
+        t.done();
+    },
+
+    'removeRoute': {
+        'should remove route': function(t) {
+            var route = this.cut.addRoute('/echo', ['mw-stack']);
+            t.equal(this.cut.mapRoute('/echo')._route, route);
+            this.cut.removeRoute(route);
+            t.equal(this.cut.mapRoute('/echo'), null);
+            t.done();
+        },
+
+        'should remove mapped route': function(t) {
+            this.cut.addRoute('/echo', ['mw-stack']);
+            var mappedRoute = this.cut.mapRoute('/echo');
+            t.equal(mappedRoute.type, 'mappedRoute');
+            this.cut.removeRoute(mappedRoute);
+            t.equal(this.cut.mapRoute('/echo'), null);
+            t.done();
+        }
+
+    },
+
     // TODO: write tests
 };
