@@ -473,6 +473,9 @@ Random observations on building fast REST services
 Todo
 ----
 
+- make sure that buffers are concatinated and returned as buffers
+- compat: res._body should be set to the send() object, not the stringified copy
+
 - if route not found, look in a "method-less" routes table to customize error
   "route not mapped" vs "POST not mapped"
 - make configurable what error to return on "route not mapped" (ie, restify 405 Method Not Allowed vs generic 404 Not Found)
