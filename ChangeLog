@@ -1,3 +1,7 @@
+0.9.1
+- fix res.send() to set res._body to raw object, and set res.headers
+- fix res.json() to set _body
+
 0.9.0
 - process requests async for a large bump in throughput
 

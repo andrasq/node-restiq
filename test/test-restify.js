@@ -100,17 +100,52 @@ module.exports = {
     },
 
     'should decorate res': {
+        setUp: function(done) {
+            this.req = this.getMockReq('/test');
+            this.res = this.getMockRes(this.req);
+            qrestify.addRestifyMethodsToReqRes(this.req, this.res);
+            done();
+        },
+
         'with send': {
             'should set res._body': function(t) {
-                var req = this.getMockReq('/test');
-                var res = this.getMockRes(req);
-                qrestify.addRestifyMethodsToReqRes({}, res);
+                var req = this.req, res = this.res;
                 res.send(201, { x: 202 }, { 'Content-Type': 'text/plain' });
                 assert.equal(res.statusCode, 201);
                 assert.deepEqual(res._body, { x: 202 });
                 assert.deepEqual(res.header('Content-Type'), 'text/plain');
                 t.done();
             },
+        },
+
+        'with get': {
+            'should return header': function(t) {
+                var req = this.req, res = this.res;
+                res.setHeader('abc', 123);
+                t.equal(res.get('abc'), 123);
+                t.done();
+            },
+        },
+
+        'with json': {
+            'should set _body and content-type': function(t) {
+                var req = this.req, res = this.res;
+                res.setHeader('Content-Type', 123);
+                res.json({ x: 234 });
+                assert.equal(res.getHeader('Content-Type'), 'application/json');
+                assert.deepEqual(res._body, { x: 234 });
+                t.done();
+            },
+        },
+    },
+
+    'should decorate Restiq with middleware builders': {
+        'should build queryParser, bodyParser, authrorizationParser and acceptParser': function(t) {
+            t.equal(typeof Restiq.queryParser(), 'function');
+            t.equal(typeof Restiq.bodyParser(), 'function');
+            t.equal(typeof Restiq.authorizationParser(), 'function');
+            t.equal(typeof Restiq.acceptParser(), 'function');
+            t.done();
         },
     },
 };
