@@ -5,6 +5,7 @@ node_js:
   - 6
   - 8
 after_success:
+  - if [ `node -p 'process.version.slice(0, 3)'` != "v8." ]; then exit; fi
   - npm install -g nyc
   - npm install -g codecov
-  - nyc --reporter lcov npm test && codecov
+  - nyc --reporter lcov -r text npm test && codecov
