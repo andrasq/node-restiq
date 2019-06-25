@@ -79,22 +79,24 @@ module.exports = {
 
     'restiq mw': {
         'should parse query params': function(t) {
-            var req = {url: "/echo?a=1&b=2", params: {}};
-            t.expect(2);
+            var req = {url: "/echo?a=1&b=2&c=3++4", params: {}};
+            t.expect(3);
             Restiq.mw.parseQueryParams(req, {}, function(err) {
                 t.ok(!err);
                 t.equal(req.params.b, 2);
+                t.equal(req.params.c, '3  4');
                 t.done();
             });
         },
 
         'should parse body params (hierarchical and urldecoded)': function(t) {
-            var req = {url: "/echo?a=1&b=2", body: "c[cc]=3&d%25=%25", _bodyEof: 1, params: {}};
-            t.expect(3);
+            var req = {url: "/echo?a=1&b=2", body: "c[cc]=3&d%25=%25&e=3++4", _bodyEof: 1, params: {}};
+            t.expect(4);
             Restiq.mw.parseBodyParams(req, {}, function(err) {
                 t.ok(!err);
                 t.equal(req.params.c.cc, 3);
                 t.equal(req.params['d%'], '%');
+                t.equal(req.params.e, '3  4');
                 t.done();
             });
         },

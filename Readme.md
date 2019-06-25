@@ -536,6 +536,7 @@ Related Work:
 - [http.ServerResponse] - https://www.nodejs.org/api/http.html#http_class_http_serverresponse
 - [restify] - http://restify.com/
 - [restiq] - https://www.npmjs.com/package/restiq
+- [fastify] - https://fastify.io
 
 [express]: https://www.npmjs.com/package/express
 [hapi]: https://www.npmjs.com/package/hapi
@@ -544,3 +545,4 @@ Related Work:
 [http.ServerResponse]: https://www.nodejs.org/api/http.html#http_class_http_serverresponse
 [restify]: https://www.npmjs.com/package/restify
 [restiq]: https://www.npmjs.com/package/restiq
+[fastify]: https://fastify.io
